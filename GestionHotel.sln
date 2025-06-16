@@ -3,9 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34916.146
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionHotel.Apis", "GestionHotel.Apis\GestionHotel.Apis.csproj", "{EA09418B-0014-43B0-9EFC-26319A763F72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GestionHotel.Apis", "GestionHotel.Apis\GestionHotel.Apis.csproj", "{EA09418B-0014-43B0-9EFC-26319A763F72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionHotel.Externals.PaiementGateways", "GestionHotel.Externals.PaiementGateways\GestionHotel.Externals.PaiementGateways.csproj", "{12E15045-F70C-49A3-8F75-E6A68C3F90FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GestionHotel.Externals.PaiementGateways", "GestionHotel.Externals.PaiementGateways\GestionHotel.Externals.PaiementGateways.csproj", "{12E15045-F70C-49A3-8F75-E6A68C3F90FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionHotel.Domain", "GestionHotel.Domain\GestionHotel.Domain.csproj", "{33FA738D-0973-4E2D-8BFC-5B769FA547E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionHotel.Application", "GestionHotel.Application\GestionHotel.Application.csproj", "{CDCEAE84-A601-4FA7-BA8B-CD67713BC02C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{33FA738D-0973-4E2D-8BFC-5B769FA547E0} = {33FA738D-0973-4E2D-8BFC-5B769FA547E0}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionHotel.Infrastructure", "GestionHotel.Infrastructure\GestionHotel.Infrastructure.csproj", "{F4E04A71-D5B7-45DF-810C-08A5FA490EFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +30,18 @@ Global
 		{12E15045-F70C-49A3-8F75-E6A68C3F90FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12E15045-F70C-49A3-8F75-E6A68C3F90FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12E15045-F70C-49A3-8F75-E6A68C3F90FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33FA738D-0973-4E2D-8BFC-5B769FA547E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33FA738D-0973-4E2D-8BFC-5B769FA547E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33FA738D-0973-4E2D-8BFC-5B769FA547E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33FA738D-0973-4E2D-8BFC-5B769FA547E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDCEAE84-A601-4FA7-BA8B-CD67713BC02C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDCEAE84-A601-4FA7-BA8B-CD67713BC02C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDCEAE84-A601-4FA7-BA8B-CD67713BC02C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDCEAE84-A601-4FA7-BA8B-CD67713BC02C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4E04A71-D5B7-45DF-810C-08A5FA490EFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4E04A71-D5B7-45DF-810C-08A5FA490EFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4E04A71-D5B7-45DF-810C-08A5FA490EFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4E04A71-D5B7-45DF-810C-08A5FA490EFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

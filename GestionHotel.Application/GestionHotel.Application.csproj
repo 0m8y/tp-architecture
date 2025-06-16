@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="UseCases\Booking\" />
+    <Folder Include="UseCases\Housekeeping\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GestionHotel.Domain\GestionHotel.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
