@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionHotel.Apis", "GestionHotel.Apis\GestionHotel.Apis.csproj", "{EA09418B-0014-43B0-9EFC-26319A763F72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionHotel.Externals.PaiementGateways", "GestionHotel.Externals.PaiementGateways\GestionHotel.Externals.PaiementGateways.csproj", "{12E15045-F70C-49A3-8F75-E6A68C3F90FB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EA09418B-0014-43B0-9EFC-26319A763F72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA09418B-0014-43B0-9EFC-26319A763F72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA09418B-0014-43B0-9EFC-26319A763F72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA09418B-0014-43B0-9EFC-26319A763F72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12E15045-F70C-49A3-8F75-E6A68C3F90FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12E15045-F70C-49A3-8F75-E6A68C3F90FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12E15045-F70C-49A3-8F75-E6A68C3F90FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12E15045-F70C-49A3-8F75-E6A68C3F90FB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
