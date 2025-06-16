@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34916.146
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionHotel.Apis", "GestionHotel.Apis\GestionHotel.Apis.csproj", "{EA09418B-0014-43B0-9EFC-26319A763F72}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionHotel.Externals.PaiementGateways", "GestionHotel.Externals.PaiementGateways\GestionHotel.Externals.PaiementGateways.csproj", "{12E15045-F70C-49A3-8F75-E6A68C3F90FB}"
@@ -18,5 +21,11 @@ Global
 		{12E15045-F70C-49A3-8F75-E6A68C3F90FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12E15045-F70C-49A3-8F75-E6A68C3F90FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12E15045-F70C-49A3-8F75-E6A68C3F90FB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E0CF93C1-7F4D-433F-BC9D-A0DB3DE9A03A}
 	EndGlobalSection
 EndGlobal
