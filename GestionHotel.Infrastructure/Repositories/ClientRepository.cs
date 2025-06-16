@@ -28,4 +28,10 @@ public class ClientRepository : IClientRepository
     {
         return _context.Clients.Any(c => c.Email == email);
     }
+
+    public Client? GetByEmail(string email)
+    {
+        return _context.Clients.FirstOrDefault(c => c.Email == email);
+    }
+
 }

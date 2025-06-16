@@ -21,6 +21,7 @@ builder.Services.AddDbContext<HotelDbContext>(options =>
     ));
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<CreateClient>();
+builder.Services.AddScoped<LoginClient>();
 
 var app = builder.Build();
 
