@@ -1,4 +1,6 @@
-﻿namespace GestionHotel.Domain.Entities;
+﻿using GestionHotel.Domain.Enums;
+
+namespace GestionHotel.Domain.Entities;
 
 public class Reservation
 {
@@ -9,4 +11,5 @@ public class Reservation
     public DateTime DateFin { get; set; }
     public decimal Total { get; set; }
     public bool EstPayee { get; set; }
+    public StatutReservation Status { get; set; }
 }
