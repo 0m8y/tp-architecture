@@ -2,14 +2,12 @@
 
 namespace GestionHotel.Domain.Entities;
 
-public class Chambre
+public class Room
 {
     public Guid Id { get; set; }
-    public string Numero { get; set; } = string.Empty;
-    public Enums.Chambre Type { get; set; }
-    public decimal Tarif { get; set; }
-    public int Capacite { get; set; }
-    public EtatChambre Etat { get; set; }
+    public string Number { get; set; } = string.Empty;
+    public RoomType Type { get; set; }
+    public decimal Price { get; set; }
+    public int Capacity { get; set; }
+    public RoomCondition Condition { get; set; }
 }
-
- 

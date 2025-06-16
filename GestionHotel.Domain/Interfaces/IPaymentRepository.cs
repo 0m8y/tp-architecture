@@ -1,7 +1,9 @@
-﻿namespace GestionHotel.Domain.Interfaces;
+﻿using GestionHotel.Domain.Entities;
 
-public interface IPaiementRepository
+namespace GestionHotel.Domain.Interfaces;
+
+public interface IPaymentRepository
 {
-    void EnregistrerPaiement(Paiement paiement);
-    Paiement? GetByReservationId(Guid reservationId);
+    void Save(Payment payment);
+    Payment? GetByReservationId(Guid reservationId);
 }

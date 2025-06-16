@@ -1,8 +1,8 @@
 ﻿namespace GestionHotel.Domain.Enums;
 
-public enum StatutReservation
+public enum ReservationStatus
 {
-    EnAttentePaiement,
-    Confirmée,
-    Annulée
+    PendingPayment,
+    Confirmed,
+    Cancelled
 }

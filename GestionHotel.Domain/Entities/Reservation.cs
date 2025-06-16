@@ -6,10 +6,10 @@ public class Reservation
 {
     public Guid Id { get; set; }
     public Guid ClientId { get; set; }
-    public List<Guid> ChambreIds { get; set; } = new();
-    public DateTime DateDebut { get; set; }
-    public DateTime DateFin { get; set; }
-    public decimal Total { get; set; }
-    public bool EstPayee { get; set; }
-    public StatutReservation Status { get; set; }
+    public List<Guid> RoomIds { get; set; } = new();
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
+    public decimal TotalAmount { get; set; }
+    public bool IsPaid { get; set; }
+    public ReservationStatus Status { get; set; }
 }
