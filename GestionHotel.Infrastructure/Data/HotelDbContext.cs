@@ -12,4 +12,10 @@ public class HotelDbContext : DbContext
     public DbSet<Room> Rooms => Set<Room>();
     public DbSet<Reservation> Reservations => Set<Reservation>();
     public DbSet<Payment> Payments => Set<Payment>();
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Client>()
+            .HasIndex(c => c.Email)
+            .IsUnique();
+    }
 }

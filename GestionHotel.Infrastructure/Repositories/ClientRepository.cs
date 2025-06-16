@@ -23,4 +23,9 @@ public class ClientRepository : IClientRepository
     {
         return _context.Clients.Find(id);
     }
+
+    public bool ExistsByEmail(string email)
+    {
+        return _context.Clients.Any(c => c.Email == email);
+    }
 }

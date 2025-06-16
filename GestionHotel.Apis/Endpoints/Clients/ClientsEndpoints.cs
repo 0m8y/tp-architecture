@@ -15,7 +15,7 @@ public static class ClientsEndpoints
             [FromBody] CreateClientRequest request,
             [FromServices] CreateClient useCase) =>
         {
-            var clientId = useCase.Execute(request.Name, request.Email);
+            var clientId = useCase.Execute(request.Name, request.Email, request.Password);
             return Results.Ok(clientId);
         })
         .WithName("CreateClient")

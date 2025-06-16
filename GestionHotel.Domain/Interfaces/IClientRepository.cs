@@ -6,4 +6,5 @@ public interface IClientRepository
 {
     Client? GetById(Guid id);
     void Add(Client client);
+    bool ExistsByEmail(string email);
 }
