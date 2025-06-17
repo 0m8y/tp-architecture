@@ -95,6 +95,7 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
 builder.Services.AddScoped<StripePaymentGatewayAdapter>();
 builder.Services.AddScoped<PaypalPaymentGatewayAdapter>();
@@ -106,6 +107,7 @@ builder.Services.AddScoped<GetAvailableRooms>();
 builder.Services.AddScoped<CreateReservation>();
 builder.Services.AddScoped<GetReservationsByClient>();
 builder.Services.AddScoped<PayReservation>();
+builder.Services.AddScoped<CancelReservation>();
 
 var app = builder.Build();
 

@@ -33,7 +33,7 @@ public class ReservationRepository : IReservationRepository
         var reservation = _context.Reservations.Find(reservationId);
         if (reservation == null) return;
 
-        reservation.Status = Domain.Enums.ReservationStatus.Canceled;
+        reservation.Status = Domain.Enums.ReservationStatus.Cancelled;
         _context.SaveChanges();
     }
 

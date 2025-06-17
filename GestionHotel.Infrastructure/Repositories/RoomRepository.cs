@@ -1,4 +1,5 @@
 ﻿using GestionHotel.Domain.Entities;
+using GestionHotel.Domain.Enums;
 using GestionHotel.Domain.Interfaces;
 using GestionHotel.Infrastructure.Data;
 
@@ -15,7 +16,9 @@ public class RoomRepository : IRoomRepository
     {
         var reservedRoomIds = _context.ReservationRooms
             .Where(rr =>
-                (from < rr.Reservation.EndDate && to > rr.Reservation.StartDate))
+                rr.Reservation.Status != ReservationStatus.Cancelled && 
+                from < rr.Reservation.EndDate &&
+                to > rr.Reservation.StartDate)
             .Select(rr => rr.RoomId)
             .Distinct();
 

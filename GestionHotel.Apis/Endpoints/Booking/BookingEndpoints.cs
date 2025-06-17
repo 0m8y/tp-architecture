@@ -79,5 +79,19 @@ public static class BookingEndpoints
 
             return Results.Ok("Payment successful and reservation confirmed");
         });
+
+        group.MapPost("/reservations/{id:guid}/cancel", [Authorize] (
+            Guid id,
+            HttpContext context,
+            [FromServices] CancelReservation useCase) =>
+        {
+            var clientId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (clientId == null)
+                return Results.Unauthorized();
+
+            var result = useCase.Execute(id, Guid.Parse(clientId));
+            return result.IsSuccess ? Results.Ok("Réservation annulée") : Results.BadRequest(result.ErrorMessage);
+        });
     }
 }
