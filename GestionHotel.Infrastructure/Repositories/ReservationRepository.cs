@@ -37,6 +37,12 @@ public class ReservationRepository : IReservationRepository
         _context.SaveChanges();
     }
 
+    public void Update(Reservation reservation)
+    {
+        _context.Reservations.Update(reservation);
+        _context.SaveChanges();
+    }
+
     public List<Reservation> GetByClientId(Guid clientId)
     {
         return _context.Reservations

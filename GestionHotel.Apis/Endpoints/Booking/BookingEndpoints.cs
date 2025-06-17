@@ -5,6 +5,7 @@ using GestionHotel.Apis.Helpers;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using GestionHotel.Domain.Enums;
 
 namespace GestionHotel.Apis.Endpoints.Booking;
 
@@ -61,6 +62,19 @@ public static class BookingEndpoints
             }).ToList();
 
             return Results.Ok(dtos);
+        });
+
+        group.MapPost("/reservations/{id:guid}/pay", [Authorize] async (
+           Guid id,
+           PayReservationRequest request,
+           PayReservation useCase) =>
+        {
+            var result = await useCase.ExecuteAsync(id, request.CardNumber, request.ExpiryDate);
+
+            if (!result.IsSuccess)
+                return Results.BadRequest(result.ErrorMessage);
+
+            return Results.Ok("Payment successful and reservation confirmed");
         });
     }
 }
