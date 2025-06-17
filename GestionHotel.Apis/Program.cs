@@ -13,7 +13,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using GestionHotel.Application.Settings;
-using GestionHotel.Infrastructure.PaiementGateways;
+using GestionHotel.Application.Factory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,8 +85,11 @@ builder.Services.AddDbContext<HotelDbContext>(options =>
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-builder.Services.AddScoped<IPaymentGateway, StripePaymentGatewayAdapter>();
+
+builder.Services.AddScoped<StripePaymentGatewayAdapter>();
+builder.Services.AddScoped<PaypalPaymentGatewayAdapter>();
+builder.Services.AddScoped<IPaymentGatewayFactory, PaymentGatewayFactory>();
+
 builder.Services.AddScoped<CreateClient>();
 builder.Services.AddScoped<LoginClient>();
 builder.Services.AddScoped<GetAvailableRooms>();

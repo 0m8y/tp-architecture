@@ -1,26 +1,27 @@
 ﻿using GestionHotel.Domain.Interfaces;
 using GestionHotel.Domain.Enums;
 using Microsoft.Extensions.Logging;
+using GestionHotel.Application.Factory;
 
 namespace GestionHotel.Application.UseCases.Booking;
 
 public class PayReservation
 {
     private readonly IReservationRepository _reservationRepository;
-    private readonly IPaymentGateway _paymentGateway;
+    private readonly IPaymentGatewayFactory _paymentGatewayFactory;
     private readonly ILogger<PayReservation> _logger;
 
     public PayReservation(
         IReservationRepository reservationRepository,
-        IPaymentGateway paymentGateway,
+        IPaymentGatewayFactory paymentGatewayFactory,
         ILogger<PayReservation> logger)
     {
         _reservationRepository = reservationRepository;
-        _paymentGateway = paymentGateway;
+        _paymentGatewayFactory = paymentGatewayFactory;
         _logger = logger;
     }
 
-    public async Task<Result> ExecuteAsync(Guid reservationId, string cardNumber, string expiryDate)
+    public async Task<Result> ExecuteAsync(Guid reservationId, string cardNumber, string expiryDate, PaymentProvider provider)
     {
         var reservation = _reservationRepository.GetById(reservationId);
 
@@ -36,7 +37,8 @@ public class PayReservation
             return Result.Failure("Cette réservation a déjà été payée.");
         }
 
-        var success = await _paymentGateway.ProcessPaymentAsync(cardNumber, expiryDate, reservation.TotalAmount);
+        var gateway = _paymentGatewayFactory.Get(provider);
+        var success = await gateway.ProcessPaymentAsync(cardNumber, expiryDate, reservation.TotalAmount);
         if (!success)
         {
             _logger.LogError("Échec du paiement pour la réservation {ReservationId}", reservationId);

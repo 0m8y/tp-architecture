@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GestionHotel.Domain\GestionHotel.Domain.csproj" />
+    <ProjectReference Include="..\GestionHotel.Externals.PaiementGateways\GestionHotel.Externals.PaiementGateways.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿using GestionHotel.Domain.Interfaces;
 using GestionHotel.Externals.PaiementGateways.Stripe;
 
-namespace GestionHotel.Infrastructure.PaiementGateways;
+namespace GestionHotel.Infrastructure.Repositories;
 
 public class StripePaymentGatewayAdapter : IPaymentGateway
 {

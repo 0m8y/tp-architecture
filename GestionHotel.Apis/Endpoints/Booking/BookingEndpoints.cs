@@ -69,7 +69,7 @@ public static class BookingEndpoints
            PayReservationRequest request,
            PayReservation useCase) =>
         {
-            var result = await useCase.ExecuteAsync(id, request.CardNumber, request.ExpiryDate);
+            var result = await useCase.ExecuteAsync(id, request.CardNumber, request.ExpiryDate, request.Provider);
 
             if (!result.IsSuccess)
                 return Results.BadRequest(result.ErrorMessage);
