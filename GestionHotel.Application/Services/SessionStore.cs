@@ -1,4 +1,4 @@
-﻿namespace GestionHotel.Application.Services;
+﻿//namespace GestionHotel.Application.Services;
 
 public static class SessionStore
 {
