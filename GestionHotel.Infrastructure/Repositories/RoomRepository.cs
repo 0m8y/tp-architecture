@@ -2,6 +2,7 @@
 using GestionHotel.Domain.Enums;
 using GestionHotel.Domain.Interfaces;
 using GestionHotel.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 public class RoomRepository : IRoomRepository
 {
@@ -31,4 +32,12 @@ public class RoomRepository : IRoomRepository
     public Room? GetById(Guid id) => _context.Rooms.Find(id);
 
     public List<Room> GetAll() => _context.Rooms.ToList();
+
+    public Room? GetWithReservationsById(Guid id)
+    {
+        return _context.Rooms
+            .Include(r => r.ReservationRooms)
+                .ThenInclude(rr => rr.Reservation)
+            .FirstOrDefault(r => r.Id == id);
+    }
 }

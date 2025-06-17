@@ -18,7 +18,10 @@ public class CreateReservation
 
     public void Execute(Guid clientId, DateTime startDate, DateTime endDate, List<Guid> roomIds)
     {
-        var rooms = roomIds.Select(id => _roomRepository.GetById(id)).Where(r => r != null).ToList();
+        var rooms = roomIds
+            .Select(id => _roomRepository.GetWithReservationsById(id))
+            .Where(r => r != null)
+            .ToList();
 
         if (rooms.Count != roomIds.Count)
             throw new Exception("Une ou plusieurs chambres sont introuvables.");
@@ -26,13 +29,12 @@ public class CreateReservation
         // Vérification de la disponibilité des chambres
         foreach (var room in rooms)
         {
-            var overlappingReservations = _roomRepository
-                .GetAll()
-                .Where(r => r.Id == room.Id)
-                .Any(r => r.ReservationRooms.Any(res =>
-                    (startDate < res.Reservation.EndDate && endDate > res.Reservation.StartDate)));
+            var overlapping = room.ReservationRooms.Any(rr =>
+                rr.Reservation.Status != ReservationStatus.Cancelled &&
+                startDate < rr.Reservation.EndDate &&
+                endDate > rr.Reservation.StartDate);
 
-            if (overlappingReservations)
+            if (overlapping)
                 throw new Exception($"La chambre {room.Number} est déjà réservée.");
         }
 
