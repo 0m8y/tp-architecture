@@ -16,7 +16,7 @@ public static class BookingEndpoints
             [FromBody] GetAvailableRoomsRequest request,
             [FromServices] GetAvailableRooms useCase) =>
         {
-            var rooms = useCase.Execute(request.StartDate, request.EndDate, request.MinCapacity);
+            var rooms = useCase.Execute(request.StartDate, request.EndDate);
             return Results.Ok(rooms);
         })
         .WithName("GetAvailableRooms")

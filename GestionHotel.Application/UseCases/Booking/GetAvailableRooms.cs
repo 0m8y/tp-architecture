@@ -12,8 +12,8 @@ public class GetAvailableRooms
         _roomRepository = roomRepository;
     }
 
-    public IEnumerable<Room> Execute(DateTime startDate, DateTime endDate, int requiredCapacity)
+    public IEnumerable<Room> Execute(DateTime startDate, DateTime endDate)
     {
-        return _roomRepository.GetAvailableRooms(startDate, endDate, requiredCapacity);
+        return _roomRepository.GetAvailableRooms(startDate, endDate);
     }
 }

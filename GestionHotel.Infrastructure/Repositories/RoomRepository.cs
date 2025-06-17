@@ -11,17 +11,19 @@ public class RoomRepository : IRoomRepository
         _context = context;
     }
 
-    public List<Room> GetAvailableRooms(DateTime from, DateTime to, int minCapacity)
+    public List<Room> GetAvailableRooms(DateTime from, DateTime to)
     {
-        // Logique de filtrage de base
+        var reservedRoomIds = _context.ReservationRooms
+            .Where(rr =>
+                (from < rr.Reservation.EndDate && to > rr.Reservation.StartDate))
+            .Select(rr => rr.RoomId)
+            .Distinct();
+
         return _context.Rooms
-            .Where(r => r.Capacity >= minCapacity &&
-                        !_context.Reservations.Any(res =>
-                            res.RoomId == r.Id &&
-                            ((from >= res.StartDate && from < res.EndDate) ||
-                             (to > res.StartDate && to <= res.EndDate))))
+            .Where(r => !reservedRoomIds.Contains(r.Id))
             .ToList();
     }
+
 
     public Room? GetById(Guid id) => _context.Rooms.Find(id);
 
