@@ -4,7 +4,7 @@ namespace GestionHotel.Domain.Interfaces;
 
 public interface IRoomRepository
 {
-    List<Room> GetAvailableRooms(DateTime from, DateTime to);
+    List<Room> GetAvailableRooms(DateTime from, DateTime to, int minCapacity);
     Room? GetById(Guid id);
     List<Room> GetAll();
 }

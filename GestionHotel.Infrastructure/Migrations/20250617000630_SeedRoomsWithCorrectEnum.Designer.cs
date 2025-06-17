@@ -4,6 +4,7 @@ using GestionHotel.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GestionHotel.Infrastructure.Migrations
 {
     [DbContext(typeof(HotelDbContext))]
-    partial class HotelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250617000630_SeedRoomsWithCorrectEnum")]
+    partial class SeedRoomsWithCorrectEnum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,8 +89,9 @@ namespace GestionHotel.Infrastructure.Migrations
                     b.Property<bool>("IsPaid")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<Guid>("RoomId")
-                        .HasColumnType("char(36)");
+                    b.Property<string>("RoomIds")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime(6)");
@@ -99,8 +103,6 @@ namespace GestionHotel.Infrastructure.Migrations
                         .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RoomId");
 
                     b.ToTable("Reservations");
                 });
@@ -222,15 +224,6 @@ namespace GestionHotel.Infrastructure.Migrations
                             Price = 150m,
                             Type = 2
                         });
-                });
-
-            modelBuilder.Entity("GestionHotel.Domain.Entities.Reservation", b =>
-                {
-                    b.HasOne("GestionHotel.Domain.Entities.Room", null)
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

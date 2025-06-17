@@ -1,20 +1,25 @@
-﻿namespace GestionHotel.Apis.Endpoints.Booking;
+﻿using GestionHotel.Application.UseCases.Booking;
+using GestionHotel.Domain.Interfaces;
+using GestionHotel.Apis.DTOs;
+using Microsoft.AspNetCore.Mvc;
 
+namespace GestionHotel.Apis.Endpoints.Booking;
 
 public static class BookingEndpoints
 {
-    private const string BASE_URL = "/api/v1/booking/";
-
     public static void MapBookingsEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup(BASE_URL)
-            .WithOpenApi()
+        var group = routes.MapGroup("/api/v1/bookings")
             .WithTags("Booking");
 
-        group.MapGet("", BookingHandler.GetAvailableRooms)
-            .WithName("GetAvailableRooms");
-
-        group.MapPost("", BookingHandler.Create)
-            .WithName("CreateBooking");
+        group.MapPost("/available-rooms", async (
+            [FromBody] GetAvailableRoomsRequest request,
+            [FromServices] GetAvailableRooms useCase) =>
+        {
+            var rooms = useCase.Execute(request.StartDate, request.EndDate, request.MinCapacity);
+            return Results.Ok(rooms);
+        })
+        .WithName("GetAvailableRooms")
+        .WithOpenApi();
     }
 }
