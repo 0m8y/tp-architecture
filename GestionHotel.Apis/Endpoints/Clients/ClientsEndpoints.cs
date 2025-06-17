@@ -1,6 +1,7 @@
-﻿using GestionHotel.Application.UseCases.Clients;
-using GestionHotel.Apis.DTOs;
+﻿using GestionHotel.Apis.DTOs;
+using GestionHotel.Application.UseCases.Clients;
 using Microsoft.AspNetCore.Mvc;
+using MiniValidation;
 
 namespace GestionHotel.Apis.Endpoints.Clients;
 
@@ -15,6 +16,9 @@ public static class ClientsEndpoints
             [FromBody] CreateClientRequest request,
             [FromServices] CreateClient useCase) =>
         {
+            if (!MiniValidator.TryValidate(request, out var errors))
+                return Results.ValidationProblem(errors);
+
             var clientId = useCase.Execute(request.Name, request.Email, request.Password);
             return Results.Ok(clientId);
         })

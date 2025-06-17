@@ -1,11 +1,11 @@
-﻿using GestionHotel.Application.UseCases.Booking;
-using GestionHotel.Domain.Interfaces;
-using GestionHotel.Apis.DTOs;
+﻿using GestionHotel.Apis.DTOs;
 using GestionHotel.Apis.Helpers;
-
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+using GestionHotel.Application.UseCases.Booking;
 using GestionHotel.Domain.Enums;
+using GestionHotel.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MiniValidation;
 
 namespace GestionHotel.Apis.Endpoints.Booking;
 
@@ -69,6 +69,9 @@ public static class BookingEndpoints
            PayReservationRequest request,
            PayReservation useCase) =>
         {
+            if (!MiniValidator.TryValidate(request, out var errors))
+                return Results.ValidationProblem(errors);
+
             var result = await useCase.ExecuteAsync(id, request.CardNumber, request.ExpiryDate, request.Provider);
 
             if (!result.IsSuccess)
