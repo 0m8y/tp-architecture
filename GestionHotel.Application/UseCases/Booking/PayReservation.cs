@@ -2,6 +2,7 @@
 using GestionHotel.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using GestionHotel.Application.Factory;
+using GestionHotel.Application.Validators;
 
 namespace GestionHotel.Application.UseCases.Booking;
 
@@ -35,6 +36,12 @@ public class PayReservation
         {
             _logger.LogInformation("Reservation already paid: {ReservationId}", reservationId);
             return Result.Failure("Cette réservation a déjà été payée.");
+        }
+
+        if (!CardValidator.IsExpiryDateValid(expiryDate))
+        {
+            _logger.LogWarning("Date d'expiration invalide pour la réservation {ReservationId}", reservationId);
+            return Result.Failure("Date d'expiration invalide.");
         }
 
         var gateway = _paymentGatewayFactory.Get(provider);

@@ -1,19 +1,18 @@
+using GestionHotel.Apis.Endpoints.Booking;
+using GestionHotel.Apis.Endpoints.Clients;
+using GestionHotel.Application.Factory;
+using GestionHotel.Application.Settings;
+using GestionHotel.Application.UseCases.Booking;
+using GestionHotel.Application.UseCases.Clients;
+using GestionHotel.Domain.Interfaces;
 using GestionHotel.Infrastructure.Data;
 using GestionHotel.Infrastructure.Repositories;
-using GestionHotel.Domain.Interfaces;
-
-using GestionHotel.Apis.Endpoints.Booking;
-using GestionHotel.Application.UseCases.Booking;
-
-using GestionHotel.Apis.Endpoints.Clients;
-using GestionHotel.Application.UseCases.Clients;
-
-using Microsoft.EntityFrameworkCore;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using GestionHotel.Application.Settings;
-using GestionHotel.Application.Factory;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +81,17 @@ builder.Services.AddDbContext<HotelDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
     ));
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false));
+    });
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false));
+});
+
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
