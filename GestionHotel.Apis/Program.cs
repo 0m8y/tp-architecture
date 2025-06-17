@@ -88,7 +88,8 @@ builder.Services.AddScoped<CreateClient>();
 builder.Services.AddScoped<LoginClient>();
 builder.Services.AddScoped<GetAvailableRooms>();
 builder.Services.AddScoped<CreateReservation>();
-    
+builder.Services.AddScoped<GetReservationsByClient>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

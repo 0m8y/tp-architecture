@@ -35,5 +35,32 @@ public static class BookingEndpoints
         })
         .WithName("GetAvailableRooms")
         .WithOpenApi();
+
+        group.MapGet("/my-reservations", [Authorize] (
+            HttpContext context,
+            GetReservationsByClient useCase) =>
+        {
+            var clientId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (clientId == null)
+                return Results.Unauthorized();
+
+            var reservations = useCase.Execute(Guid.Parse(clientId));
+
+            var dtos = reservations.Select(r => new ReservationDto
+            {
+                Id = r.Id,
+                StartDate = r.StartDate,
+                EndDate = r.EndDate,
+                TotalAmount = r.TotalAmount,
+                IsPaid = r.IsPaid,
+                Status = r.Status.ToString(),
+                RoomNumbers = r.ReservationRooms
+                    .Select(rr => rr.Room.Number)
+                    .Distinct()
+                    .ToList()
+            }).ToList();
+
+            return Results.Ok(dtos);
+        });
     }
 }
