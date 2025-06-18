@@ -122,23 +122,9 @@ Depuis Visual Studio :
 ## Schémas d'architecture
 
 
-### Vue globale de l’architecture
+### Clean Architecture
 
-```mermaid
-graph TD
-    Apis["GestionHotel.Apis\n- Endpoints (Minimal API)\n- DTOs"]
-    Application["GestionHotel.Application\n- UseCases\n- Services / Validateurs"]
-    Domain["GestionHotel.Domain\n- Entités\n- Interfaces\n- Règles métier"]
-    Infrastructure["GestionHotel.Infrastructure\n- Repos EF Core\n- Intégrations externes\n- Configuration BDD"]
-    Gateways["GestionHotel.Externals.PaiementGateways\n- Stripe\n- Paypal"]
-
-    Apis --> Application
-    Application --> Domain
-    Application --> Gateways
-    Apis --> Infrastructure
-    Infrastructure --> Domain
-    Infrastructure --> Gateways
-```
+![Architecture globale](Diagrams/global-architecture.png)
 
 ---
 
