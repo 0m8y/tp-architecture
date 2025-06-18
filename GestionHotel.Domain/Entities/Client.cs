@@ -1,4 +1,6 @@
-﻿namespace GestionHotel.Domain.Entities;
+﻿using GestionHotel.Domain.Enums;
+
+namespace GestionHotel.Domain.Entities;
 
 public class Client
 {
@@ -6,4 +8,5 @@ public class Client
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
+    public Role Role { get; set; } = Role.Client;
 }

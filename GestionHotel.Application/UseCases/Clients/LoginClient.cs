@@ -38,9 +38,10 @@ public class LoginClient
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[] {
-            new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()),
-            new Claim(ClaimTypes.Email, client.Email)
-        }),
+                new Claim(ClaimTypes.NameIdentifier, client.Id.ToString()),
+                new Claim(ClaimTypes.Email, client.Email),
+                new Claim(ClaimTypes.Role, client.Role.ToString())
+            }),
             Expires = DateTime.UtcNow.AddHours(2),
             SigningCredentials = creds
         };
