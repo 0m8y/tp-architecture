@@ -110,14 +110,25 @@ public static class BookingEndpoints
         group.MapPost("/reservations/{id:guid}/cancel", [Authorize] (
             Guid id,
             HttpContext context,
+            [FromQuery] bool refund,
             [FromServices] CancelReservation useCase) =>
         {
-            var clientId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var user = context.User;
+            var clientIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var isReceptionist = user.IsInRole("Receptionist");
 
-            if (clientId == null)
+            if (!isReceptionist && clientIdClaim == null)
                 return Results.Unauthorized();
 
-            var result = useCase.Execute(id, Guid.Parse(clientId));
+            var clientId = isReceptionist ? Guid.Empty : Guid.Parse(clientIdClaim);
+
+            var result = useCase.Execute(
+                reservationId: id,
+                clientId: clientId,
+                isReceptionist: isReceptionist,
+                forceRefund: isReceptionist && refund
+            );
+
             return result.IsSuccess
                 ? Results.Ok(result.Message)
                 : Results.BadRequest(result.ErrorMessage);

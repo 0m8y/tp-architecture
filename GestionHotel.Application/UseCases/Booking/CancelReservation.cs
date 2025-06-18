@@ -20,28 +20,22 @@ public class CancelReservation
         _logger = logger;
     }
 
-    public Result Execute(Guid reservationId, Guid clientId)
+    public Result Execute(Guid reservationId, Guid clientId, bool isReceptionist = false, bool forceRefund = false)
     {
         var reservation = _reservationRepository.GetById(reservationId);
         if (reservation == null)
             return Result.Failure("Réservation introuvable.");
 
-        if (reservation.ClientId != clientId)
+        if (!isReceptionist && reservation.ClientId != clientId)
             return Result.Failure("Accès refusé à cette réservation.");
 
         if (reservation.Status == ReservationStatus.Cancelled)
             return Result.Failure("Réservation déjà annulée.");
 
         var now = DateTime.UtcNow;
-
-        // On suppose que StartDate est en heure locale => on la convertit correctement en UTC
         var startUtc = TimeZoneInfo.ConvertTimeToUtc(reservation.StartDate, TimeZoneInfo.Local);
-
-        _logger.LogInformation("Annulation demandée à {Now} ({NowKind}), StartDate: {Start} ({StartKind}), Interprété comme UTC: {StartUtc}",
-            now, now.Kind, reservation.StartDate, reservation.StartDate.Kind, startUtc);
-
         var hoursBeforeStart = (startUtc - now).TotalHours;
-        var refundEligible = hoursBeforeStart >= 48;
+        var refundEligible = hoursBeforeStart >= 48 || (isReceptionist && forceRefund);
 
         reservation.Status = ReservationStatus.Cancelled;
         _reservationRepository.Update(reservation);
@@ -60,13 +54,13 @@ public class CancelReservation
             }
             else
             {
-                _logger.LogWarning("Réservation {ReservationId} annulée, mais aucun enregistrement de paiement n'a été trouvé pour effectuer le remboursement.", reservationId);
-                return Result.Success("Réservation annulée. Aucun remboursement n’a pu être effectué car le paiement n’a pas été retrouvé.");
+                _logger.LogWarning("Réservation {ReservationId} annulée, mais aucun paiement retrouvé.", reservationId);
+                return Result.Success("Réservation annulée. Aucun remboursement possible (paiement non retrouvé).");
             }
         }
 
-        _logger.LogInformation("Réservation {ReservationId} annulée. Remboursement non éligible (différence {Hours}h)", reservationId, hoursBeforeStart);
-
-        return Result.Success("Réservation annulée. Aucun remboursement n’est possible car l’annulation a eu lieu moins de 48h avant le début.");
+        _logger.LogInformation("Réservation {ReservationId} annulée. Aucun remboursement (différence {Hours}h)", reservationId, hoursBeforeStart);
+        return Result.Success("Réservation annulée. Aucun remboursement possible.");
     }
+
 }

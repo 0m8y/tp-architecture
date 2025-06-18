@@ -25,7 +25,6 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "GestionHotel API", Version = "v1" });
 
-    // 🔐 Ajout du support de l'authentification Bearer JWT dans Swagger
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",

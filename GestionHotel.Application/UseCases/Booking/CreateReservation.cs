@@ -26,7 +26,6 @@ public class CreateReservation
         if (rooms.Count != roomIds.Count)
             throw new Exception("Une ou plusieurs chambres sont introuvables.");
 
-        // Vérification de la disponibilité des chambres
         foreach (var room in rooms)
         {
             var overlapping = room.ReservationRooms.Any(rr =>

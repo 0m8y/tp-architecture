@@ -32,7 +32,7 @@ public class LoginClient
         if (!isValid)
             throw new InvalidOperationException("Invalid email or password.");
 
-        var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtKey)); // stocké en config
+        var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var tokenDescriptor = new SecurityTokenDescriptor
