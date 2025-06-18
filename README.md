@@ -126,11 +126,11 @@ Depuis Visual Studio :
 
 ```mermaid
 graph TD
-    Apis[GestionHotel.Apis<br>• Endpoints (Minimal API)<br>• DTOs]
-    Application[GestionHotel.Application<br>• UseCases<br>• Services / Validateurs]
-    Domain[GestionHotel.Domain<br>• Entités<br>• Interfaces<br>• Règles métier]
-    Infrastructure[GestionHotel.Infrastructure<br>• Repos EF Core<br>• Intégrations externes<br>• Configuration BDD]
-    Gateways[GestionHotel.Externals.PaiementGateways<br>• Stripe<br>• Paypal]
+    Apis["GestionHotel.Apis\n- Endpoints (Minimal API)\n- DTOs"]
+    Application["GestionHotel.Application\n- UseCases\n- Services / Validateurs"]
+    Domain["GestionHotel.Domain\n- Entités\n- Interfaces\n- Règles métier"]
+    Infrastructure["GestionHotel.Infrastructure\n- Repos EF Core\n- Intégrations externes\n- Configuration BDD"]
+    Gateways["GestionHotel.Externals.PaiementGateways\n- Stripe\n- Paypal"]
 
     Apis --> Application
     Application --> Domain
