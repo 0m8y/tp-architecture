@@ -32,6 +32,9 @@ public class CancelReservation
         if (reservation.Status == ReservationStatus.Cancelled)
             return Result.Failure("Réservation déjà annulée.");
 
+        if (reservation.Status == ReservationStatus.Completed)
+            return Result.Failure("Réservation déjà terminée.");
+
         if (reservation.Status == ReservationStatus.CheckIn)
             return Result.Failure("Impossible d'annuler une réservation déjà enregistrée (check-in effectué).");
 

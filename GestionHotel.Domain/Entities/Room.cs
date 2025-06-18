@@ -10,4 +10,5 @@ public class Room
     public int Capacity { get; set; }
     public RoomCondition Condition { get; set; }
     public List<ReservationRoom> ReservationRooms { get; set; } = new();
+    public bool NeedsCleaning { get; set; }
 }

@@ -109,6 +109,7 @@ builder.Services.AddScoped<GetReservationsByClient>();
 builder.Services.AddScoped<PayReservation>();
 builder.Services.AddScoped<CancelReservation>();
 builder.Services.AddScoped<CheckInReservation>();
+builder.Services.AddScoped<CheckOutReservation>();
 
 var app = builder.Build();
 

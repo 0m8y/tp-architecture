@@ -1,6 +1,7 @@
 ﻿using GestionHotel.Apis.DTOs;
 using GestionHotel.Apis.Helpers;
 using GestionHotel.Application.UseCases.Booking;
+using GestionHotel.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniValidation;
@@ -151,5 +152,16 @@ public static class BookingEndpoints
         })
         .WithName("CheckInReservation")
         .WithOpenApi();
+
+        group.MapPost("/reservations/{id:guid}/checkout", [Authorize(Roles = "Receptionist")] async (
+            Guid id,
+            [FromServices] CheckOutReservation useCase) =>
+        {
+            var result = useCase.Execute(id);
+
+            return result.IsSuccess
+                ? Results.Ok(result.Message)
+                : Results.BadRequest(result.ErrorMessage);
+        });
     }
 }

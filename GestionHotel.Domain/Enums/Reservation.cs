@@ -5,5 +5,6 @@ public enum ReservationStatus
     PendingPayment,
     Confirmed,
     Cancelled,
-    CheckIn
+    CheckIn,
+    Completed
 }

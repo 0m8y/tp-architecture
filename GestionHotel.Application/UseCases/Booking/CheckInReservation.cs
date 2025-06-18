@@ -35,6 +35,9 @@ public class CheckInReservation
         if (reservation.Status == ReservationStatus.Cancelled)
             return Result.Failure("La réservation est annulée.");
 
+        if (reservation.Status == ReservationStatus.Completed)
+            return Result.Failure("La réservation est terminée.");
+
         if (reservation.Status == ReservationStatus.CheckIn)
             return Result.Failure("Le client a déjà effectué le check-in.");
 
