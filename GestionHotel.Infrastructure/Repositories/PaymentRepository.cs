@@ -1,21 +1,32 @@
-﻿using System.Collections.Concurrent;
-using GestionHotel.Domain.Entities;
+﻿using GestionHotel.Domain.Entities;
 using GestionHotel.Domain.Interfaces;
+using GestionHotel.Infrastructure.Data;
 
 namespace GestionHotel.Infrastructure.Repositories;
 
 public class PaymentRepository : IPaymentRepository
 {
-    private readonly ConcurrentDictionary<Guid, Payment> _payments = new();
+    private readonly HotelDbContext _context;
 
-    public void Save(Payment payment)
+    public PaymentRepository(HotelDbContext context)
     {
-        _payments[payment.ReservationId] = payment;
+        _context = context;
+    }
+
+    public void Add(Payment payment)
+    {
+        _context.Payments.Add(payment);
+        _context.SaveChanges();
+    }
+
+    public void Update(Payment payment)
+    {
+        _context.Payments.Update(payment);
+        _context.SaveChanges();
     }
 
     public Payment? GetByReservationId(Guid reservationId)
     {
-        _payments.TryGetValue(reservationId, out var payment);
-        return payment;
+        return _context.Payments.FirstOrDefault(p => p.ReservationId == reservationId);
     }
 }

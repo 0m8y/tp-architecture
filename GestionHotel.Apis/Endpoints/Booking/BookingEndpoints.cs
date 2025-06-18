@@ -91,7 +91,9 @@ public static class BookingEndpoints
                 return Results.Unauthorized();
 
             var result = useCase.Execute(id, Guid.Parse(clientId));
-            return result.IsSuccess ? Results.Ok("Réservation annulée") : Results.BadRequest(result.ErrorMessage);
+            return result.IsSuccess
+                ? Results.Ok(result.Message)
+                : Results.BadRequest(result.ErrorMessage);
         });
     }
 }

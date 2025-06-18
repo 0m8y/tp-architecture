@@ -33,7 +33,14 @@ public class CancelReservation
             return Result.Failure("Réservation déjà annulée.");
 
         var now = DateTime.UtcNow;
-        var hoursBeforeStart = (reservation.StartDate - now).TotalHours;
+
+        // On suppose que StartDate est en heure locale => on la convertit correctement en UTC
+        var startUtc = TimeZoneInfo.ConvertTimeToUtc(reservation.StartDate, TimeZoneInfo.Local);
+
+        _logger.LogInformation("Annulation demandée à {Now} ({NowKind}), StartDate: {Start} ({StartKind}), Interprété comme UTC: {StartUtc}",
+            now, now.Kind, reservation.StartDate, reservation.StartDate.Kind, startUtc);
+
+        var hoursBeforeStart = (startUtc - now).TotalHours;
         var refundEligible = hoursBeforeStart >= 48;
 
         reservation.Status = ReservationStatus.Cancelled;
@@ -45,12 +52,21 @@ public class CancelReservation
             if (payment != null)
             {
                 payment.IsRefunded = true;
-                _paymentRepository.Save(payment);
+                _paymentRepository.Update(payment);
+
+                var refundAmount = reservation.TotalAmount;
+                _logger.LogInformation("Réservation {ReservationId} annulée. Remboursement : {Amount}€", reservationId, refundAmount);
+                return Result.Success($"Réservation annulée. Un remboursement de {refundAmount:0.00}€ sera effectué.");
+            }
+            else
+            {
+                _logger.LogWarning("Réservation {ReservationId} annulée, mais aucun enregistrement de paiement n'a été trouvé pour effectuer le remboursement.", reservationId);
+                return Result.Success("Réservation annulée. Aucun remboursement n’a pu être effectué car le paiement n’a pas été retrouvé.");
             }
         }
 
-        _logger.LogInformation("Réservation {ReservationId} annulée. Remboursement : {Refunded}", reservationId, refundEligible);
+        _logger.LogInformation("Réservation {ReservationId} annulée. Remboursement non éligible (différence {Hours}h)", reservationId, hoursBeforeStart);
 
-        return Result.Success();
+        return Result.Success("Réservation annulée. Aucun remboursement n’est possible car l’annulation a eu lieu moins de 48h avant le début.");
     }
 }

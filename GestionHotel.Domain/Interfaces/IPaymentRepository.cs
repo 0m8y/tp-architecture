@@ -4,6 +4,7 @@ namespace GestionHotel.Domain.Interfaces;
 
 public interface IPaymentRepository
 {
-    void Save(Payment payment);
+    void Add(Payment payment);
+    void Update(Payment payment);
     Payment? GetByReservationId(Guid reservationId);
 }
