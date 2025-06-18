@@ -62,7 +62,7 @@ Exemple de chaîne de connexion :
 },
 "Jwt": {
   "Key": "JWT_KEY"
-}V
+}
 ```
 
 ### Création de la base de données
@@ -126,6 +126,8 @@ Depuis Visual Studio :
 ![Architecture globale](Diagrams/global-architecture.png)
 
 ---
+
+### Diagramme de dépendance
 
 ```mermaid
 graph TD
