@@ -1,4 +1,6 @@
-﻿public class ReservationDto
+﻿namespace GestionHotel.Apis.DTOs;
+
+public class ReservationDto
 {
     public Guid Id { get; set; }
     public DateTime StartDate { get; set; }

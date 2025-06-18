@@ -133,5 +133,23 @@ public static class BookingEndpoints
                 ? Results.Ok(result.Message)
                 : Results.BadRequest(result.ErrorMessage);
         });
+
+        group.MapPost("/reservations/{id:guid}/checkin", [Authorize(Roles = "Receptionist")] async (
+            Guid id,
+            [FromBody] CheckInReservationRequest request,
+            CheckInReservation useCase) =>
+        {
+            if (!MiniValidator.TryValidate(request, out var errors))
+                return Results.ValidationProblem(errors);
+
+            var result = await useCase.ExecuteAsync(id, request.CardNumber, request.ExpiryDate, request.Provider);
+
+            if (!result.IsSuccess)
+                return Results.BadRequest(result.ErrorMessage);
+
+            return Results.Ok(result.Message);
+        })
+        .WithName("CheckInReservation")
+        .WithOpenApi();
     }
 }

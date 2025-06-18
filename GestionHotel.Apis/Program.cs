@@ -103,10 +103,12 @@ builder.Services.AddScoped<IPaymentGatewayFactory, PaymentGatewayFactory>();
 builder.Services.AddScoped<CreateClient>();
 builder.Services.AddScoped<LoginClient>();
 builder.Services.AddScoped<GetAvailableRooms>();
+
 builder.Services.AddScoped<CreateReservation>();
 builder.Services.AddScoped<GetReservationsByClient>();
 builder.Services.AddScoped<PayReservation>();
 builder.Services.AddScoped<CancelReservation>();
+builder.Services.AddScoped<CheckInReservation>();
 
 var app = builder.Build();
 
