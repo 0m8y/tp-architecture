@@ -32,6 +32,9 @@ public class CancelReservation
         if (reservation.Status == ReservationStatus.Cancelled)
             return Result.Failure("Réservation déjà annulée.");
 
+        if (reservation.Status == ReservationStatus.CheckIn)
+            return Result.Failure("Impossible d'annuler une réservation déjà enregistrée (check-in effectué).");
+
         var now = DateTime.UtcNow;
         var startUtc = TimeZoneInfo.ConvertTimeToUtc(reservation.StartDate, TimeZoneInfo.Local);
         var hoursBeforeStart = (startUtc - now).TotalHours;
@@ -62,5 +65,6 @@ public class CancelReservation
         _logger.LogInformation("Réservation {ReservationId} annulée. Aucun remboursement (différence {Hours}h)", reservationId, hoursBeforeStart);
         return Result.Success("Réservation annulée. Aucun remboursement possible.");
     }
+
 
 }
