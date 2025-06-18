@@ -82,7 +82,7 @@ public class CreateReservationTests
             Id = roomId,
             Number = "101",
             Type = RoomType.Single,
-            ReservationRooms = new List<ReservationRoom>() // aucune réservation
+            ReservationRooms = new List<ReservationRoom>()
         };
 
         _roomRepoMock.Setup(r => r.GetWithReservationsById(roomId)).Returns(room);
