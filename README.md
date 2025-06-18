@@ -100,6 +100,38 @@ Depuis Visual Studio :
 
 (Identifiants simulés — intégration de l’authentification par rôle via JWT.)
 
+
+---
+
+## Design Patterns utilisés
+
+| Pattern                            | Localisation                                           | Rôle / Utilité                                                                 |
+| ---------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| **Factory Method**                 | `PaymentGatewayFactory.cs`                             | Permet de créer dynamiquement un adaptateur de paiement (Stripe / Paypal).     |
+| **Strategy (via Factory)**         | `IPaymentGateway` + adaptateurs Paypal / Stripe        | Encapsule des algorithmes de paiement interchangeables selon le provider.      |
+| **Repository**                     | `*Repository.cs` dans `Infrastructure.Repositories`    | Centralise les accès aux données (EF Core), découplé du domaine.               |
+| **Dependency Injection**           | `Program.cs`                                           | Injection des dépendances via services (`AddScoped<...>`)                      |
+| **DTO (Data Transfer Object)**     | `GestionHotel.Apis.DTOs.*`                             | Transporte les données entre client et API, sans exposer directement le modèle |
+| **Use Case / Application Service** | `Application.UseCases.*`                               | Regroupe la logique métier de haut niveau (CheckIn, Cancel, etc.).             |
+| **Enum + Policy Rule**             | `Enums/Room.cs`, `Enums/Role.cs`, `RoomTypePricing.cs` | Encapsule des règles métiers (tarifs, rôles, états de chambre) via enums.      |
+| **Clean Architecture**             | Architecture globale du projet                         | Séparation claire des responsabilités et dépendances entre couches.            |
+
+---
+
+## Respect des principes SOLID
+
+L’architecture du projet suit les principes SOLID, garantissant un code maintenable, modulaire et extensible :
+
+* **S** – *Single Responsibility Principle* : chaque classe a une responsabilité unique. Les `UseCases` gèrent un cas métier spécifique (ex. : `CancelReservation.cs`), les `Repositories` s’occupent uniquement de la persistance, et les `DTOs` sont dédiés à la communication entre API et client.
+
+* **O** – *Open/Closed Principle* : le système est ouvert à l’extension mais fermé à la modification. Par exemple, l’ajout d’un nouveau moyen de paiement ne nécessite pas de modifier les cas d’usage existants, grâce au pattern Strategy implémenté via `IPaymentGateway`.
+
+* **L** – *Liskov Substitution Principle* : les implémentations concrètes (`StripeGateway`, `PaypalGateway`) peuvent être utilisées sans altérer le comportement attendu de `IPaymentGateway`.
+
+* **I** – *Interface Segregation Principle* : les interfaces comme `IPaymentRepository`, `IRoomRepository`, etc., sont spécifiques à leurs cas d’usage, évitant les dépendances inutiles.
+
+* **D** – *Dependency Inversion Principle* : les couches haut niveau (Application) ne dépendent que d’abstractions (interfaces dans `Domain`). Les dépendances concrètes sont injectées depuis la couche `Infrastructure`.
+
 ---
 
 ## Fonctionnalités implémentées
