@@ -34,6 +34,30 @@ public class HotelDbContext : DbContext
             .WithMany(r => r.ReservationRooms)
             .HasForeignKey(rr => rr.RoomId);
 
+        modelBuilder.Entity<Client>().HasData(
+            new Client
+            {
+                Id = Guid.Parse("22222222-1111-1111-1111-111111111111"),
+                Email = "client@mail.com",
+                Password = "$2a$11$Z2hhARDoUFkWGfmAQ3dDWehkNupOwBpOFl8bZ444iHOujoSn248Sy",
+                Role = Role.Client
+            },
+            new Client
+            {
+                Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                Email = "receptionist@mail.com",
+                Password = "$2a$11$Z2hhARDoUFkWGfmAQ3dDWehkNupOwBpOFl8bZ444iHOujoSn248Sy",
+                Role = Role.Receptionist
+            },
+            new Client
+            {
+                Id = Guid.Parse("22222222-3333-3333-3333-333333333333"),
+                Email = "cleaner@mail.com",
+                Password = "$2a$11$Z2hhARDoUFkWGfmAQ3dDWehkNupOwBpOFl8bZ444iHOujoSn248Sy",
+                Role = Role.Cleaner
+            }
+        );
+
         modelBuilder.Entity<Room>().HasData(
             new Room { Id = Guid.Parse("11111111-1111-1111-1111-111111111101"), Number = "101", Capacity = 1, Type = RoomType.Single, Condition = RoomCondition.New },
             new Room { Id = Guid.Parse("11111111-1111-1111-1111-111111111102"), Number = "102", Capacity = 1, Type = RoomType.Single, Condition = RoomCondition.New },

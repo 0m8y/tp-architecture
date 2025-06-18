@@ -1,0 +1,6 @@
+SET SQL_SAFE_UPDATES = 0;
+DELETE FROM ReservationRooms;
+DELETE FROM Payments;
+DELETE FROM Reservations;
+DELETE FROM Clients;
+DELETE FROM Rooms;
