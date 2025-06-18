@@ -1,0 +1,91 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="27.1.6">
+  <diagram name="Page-1" id="449hK7DlhnuSuYzG8ebh">
+    <mxGraphModel dx="1210" dy="1184" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-1" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="276" y="170" width="276" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-2" value="&lt;ul&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Endpoints (Minimal API)&lt;/span&gt;&lt;/li&gt;&lt;li&gt;DTOs&lt;/li&gt;&lt;/ul&gt;" style="text;strokeColor=none;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=middle;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="289" y="200" width="250" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-3" value="GestionHotel.Apis" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="354" y="180" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-5" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="wGl6Vz9NmTP3muk9K_Vg-1" target="wGl6Vz9NmTP3muk9K_Vg-6">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="300" as="sourcePoint" />
+            <mxPoint x="430" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-6" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="276" y="360" width="276" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-7" value="&lt;ul&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;UseCases&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Services / Validateurs&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;" style="text;strokeColor=none;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=middle;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="289" y="392" width="250" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-8" value="GestionHotel.Application" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="277" y="370" width="274" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-9" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="78" y="560" width="276" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-10" value="&lt;ul&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Entités&lt;/span&gt;&lt;/li&gt;&lt;li&gt;Interfaces&lt;/li&gt;&lt;li&gt;Règles métier&lt;/li&gt;&lt;/ul&gt;" style="text;strokeColor=none;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=middle;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="91" y="592" width="250" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-11" value="GestionHotel.Domain" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="79" y="570" width="274" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-13" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="474" y="560" width="276" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-14" value="&lt;ul&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Stripe&lt;/span&gt;&lt;/li&gt;&lt;li&gt;Paypal&lt;/li&gt;&lt;/ul&gt;" style="text;strokeColor=none;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=middle;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="487" y="592" width="250" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-15" value="GestionHotel.External.PaiementGateways" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="475" y="570" width="274" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-16" value="" style="endArrow=none;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" target="wGl6Vz9NmTP3muk9K_Vg-6">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="414" y="510" as="sourcePoint" />
+            <mxPoint x="410" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-17" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="550" y="510" as="sourcePoint" />
+            <mxPoint x="285" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-18" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="wGl6Vz9NmTP3muk9K_Vg-9">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="285" y="510" as="sourcePoint" />
+            <mxPoint x="290" y="500" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-19" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="550" y="510" as="sourcePoint" />
+            <mxPoint x="550" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-20" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" target="wGl6Vz9NmTP3muk9K_Vg-9">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="216" y="730" as="sourcePoint" />
+            <mxPoint x="160" y="870" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-21" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="79" y="730" width="276" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-22" value="&lt;ul&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Repos EF Core&lt;/span&gt;&lt;/li&gt;&lt;li&gt;Intégration externes&lt;/li&gt;&lt;li&gt;Configuration BDD&lt;/li&gt;&lt;/ul&gt;" style="text;strokeColor=none;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=middle;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="92" y="762" width="250" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="wGl6Vz9NmTP3muk9K_Vg-23" value="GestionHotel.Infrastructure" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="740" width="274" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

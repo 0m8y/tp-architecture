@@ -1,56 +1,163 @@
-# Système de Gestion d'Hôtel
+# Gestion d'Hôtel — TP Architecture .NET 8
 
-Ce projet a pour objectif de développer une application API web en C# pour la gestion d'un hôtel, couvrant divers aspects comme la réservation de chambres, la gestion des clients, le personnel et les services de l'hôtel.
+## Objectif
 
-L'objectif est d'appliquer les concepts de programmation orientée objet, les patterns d'architecture et de conception, et de développer une application fonctionnelle et sécurisée.
+Ce projet a pour objectif de mettre en œuvre une architecture logicielle propre (Clean Architecture) dans un contexte métier simple : la gestion d’un hôtel avec des réservations, paiements, check-in/out et gestion des chambres. Le tout est structuré autour de bonnes pratiques : séparation des couches, injection de dépendances, gestion des rôles utilisateurs, et mise en place d’authentification via JWT.
 
-## Fonctionnalités Attendues
+---
 
-### Client
-- **Liste des chambres disponibles** : Obtenir la liste des chambres disponibles à une plage de dates donnée.
-- **Réservation de chambre** : Réserver une chambre sur cette plage de date, si elle est disponible, avec possibilité de paiement (numéro de carte bleue, appel à un faux service de paiement).
-  - Une chambre a un tarif
-  - Une chambre peux accueillir un nombre de personnes
-  - Une chambre a un type (simple, double, suite...), qui définit son tarif
-  - Un client peut réserver plusieurs chambres selon leur nombre
-- **Annulation de réservation** : Annuler sa réservation avec gestion de remboursement sous conditions.
-- **Notification pré-séjour** : Optionnel - Recevoir une notification (email/SMS) un jour avant la date du séjour.
+## Technologies utilisées
 
-### Réceptionniste
-- Mêmes fonctionnalités que le client, avec plus d'informations ou de droits:
-  - **Liste des chambre disponibles** : Obtenir la liste des chambres disponibles à une plage de dates donnée, avec une information sur l'état général de la chambre (Neuf, Refaite, A refaire, Rien a signaler, Gros dégats).
-  - **Annulation de réservation** : Annuler une réservation pour un client, si l'annulation à lieu moins de 48 heures avant la date de réservation, la receptionniste peut choisir de rembourser ou non le client, malgè la règle de base.
-- **Gestion de l'arrivée** : Noter l'occupation de la chambre et gérer les paiements non effectués.
-- **Gestion du départ** : Marquer la chambre pour nettoyage et gérer les paiements restants.
-- **Envoi d'email post-séjour** : Optionel - Envoyer un email type "donnez votre avis" après le départ du client.
+* .NET 8
+* ASP.NET Core Web API
+* Entity Framework Core (Provider : Pomelo MySQL)
+* MySQL Workbench
+* JWT (Json Web Tokens)
+* Swagger / OpenAPI
+* Clean Architecture
+* Visual Studio 2022
 
-### Personnel de Ménage
-- **Liste des chambres à nettoyer** : Accéder à la liste des chambres à nettoyer, avec priorisation (une chambre déjà nettoyé et non occupée depuis n'est pas à nettoyer).
-- **Marquage des chambres nettoyées** : Noter une chambre comme nettoyée.
-- **Notification de casse** : Optionel - Signaler des dommages pour ajustement des frais de paiement.
+---
 
-## Règles Associées
-- Les annulations faites moins de 48 heures avant la date de réservation ne seront pas remboursées.
-- Les fonctionnalités optionnelles sont encouragées pour les étudiants désirant aller au-delà des exigences de base.
-- L'authentification et la gestion des rôles doivent être implémentées pour différencier les acteurs.
+## Structure du projet
 
-## Critères d'Évaluation
-- **Architecture et Conception** : Application correcte des patterns d'architecture et de conception discutés en cours.
-- **Qualité du Code** : Respect des principes SOLID, respect des principes objets (encapsulation, héritage, composition...).
-- **Fonctionnalité** : L'application doit fonctionner comme spécifié, gérer correctement les erreurs et être sécurisée.
-- **Documentation** : Un rapport expliquant les choix d'architecture, les défis rencontrés et les solutions adoptées.
-- **Optionel** : Tests unitaires, micro services...
+```
+GestionHotel.sln
+├── GestionHotel.Apis              // Couche API (endpoints, DTO, configuration)
+├── GestionHotel.Application       // Use cases, services métier, validation
+├── GestionHotel.Domain            // Entités, interfaces, enums, règles métiers
+├── GestionHotel.Infrastructure    // Repositories, EF Core, contextes, paiement
+├── GestionHotel.Externals.PaiementGateways // Adaptateurs Stripe / Paypal
+```
 
-## Non évalué
-- **Frontend** : L'application doit être une API web, mais un frontend est optionnel.
-- **Base de Données** : L'application doit utiliser une base de données (ou un systeme de persistance), mais le choix de la base de données est libre.
-- **Authentification** : L'application doit gérer l'authentification, mais le choix de la méthode est libre. Une solution simple de stockage des utilisateurs est suffisante.
+## Mise en route
 
-## Consignes de Soumission
-- Le code source doit être soumis via un dépôt Git ou un zip envoyé par email avant la date limite spécifiée.
-- Inclure un fichier `README.md` dans votre dépôt, détaillant comment exécuter l'application et des exemples d'utilisation.
-- Soumettre également le rapport de documentation en format PDF.
+### Prérequis
 
-## Ressources Fournies
-- Une base de projet ASP.Net avec une API controller pour servir d'exemple.
-- Un projet pour simuler des services de paiement. Le contenu de ce projet ne doit pas/peut pas être modifié.
+* [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download)
+* [MySQL Server](https://dev.mysql.com/downloads/mysql/)
+* [MySQL Workbench](https://www.mysql.com/products/workbench/)
+* [Visual Studio 2022 Community](https://visualstudio.microsoft.com/fr/vs/community/)
+
+### Installation de l'outil `dotnet ef`
+
+Dans un terminal, installez les outils de migration EF Core si ce n’est pas déjà fait :
+
+```bash
+dotnet tool install --global dotnet-ef
+```
+### Configuration
+
+Configurer votre base de données dans le fichier :
+
+```
+GestionHotel.Apis/appsettings.json
+```
+
+Exemple de chaîne de connexion :
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "server=localhost;port=3306;database=gestion_hotel;user=root;password=motdepasse"
+},
+"Jwt": {
+  "Key": "JWT_KEY"
+}V
+```
+
+### Création de la base de données
+
+Depuis la racine du projet :
+
+```bash
+dotnet ef database update --project GestionHotel.Infrastructure
+```
+
+## Lancement de l’application
+
+Depuis Visual Studio :
+
+* Démarrer le projet `GestionHotel.Apis` (API REST)
+* Swagger est disponible à l’adresse :
+  `https://localhost:7208/swagger`
+
+---
+
+## Rôles & Comptes disponibles
+
+* **Client**
+
+  * Email : [client@mail.com](mailto:client@mail.com)
+  * Mot de passe : `password`
+* **Réceptionniste**
+
+  * Email : [receptionist@mail.com](mailto:receptionist@mail.com)
+  * Mot de passe : `password`
+* **Personnel de ménage**
+
+  * Email : [cleaner@mail.com](mailto:cleaner@mail.com)
+  * Mot de passe : `password`
+
+(Identifiants simulés — intégration de l’authentification par rôle via JWT.)
+
+---
+
+## Fonctionnalités implémentées
+
+| Fonctionnalité                | Description                                           |
+| ----------------------------- | ----------------------------------------------------- |
+| Authentification / JWT        | Génération et validation de token JWT avec rôle       |
+| Création de client            | Création d’un compte client                           |
+| Connexion                     | Login avec token JWT                                  |
+| Réservation de chambre        | Choix de dates, nombre de personnes, types de chambre |
+| Paiement                      | Paiement via Stripe ou Paypal (Utilisation de le `GestionHotel.Externals.PaiementGateways`)       |
+| Check-in                      | Validation d’arrivée pour une réservation et payement si ce n'est pas fait         |
+| Annulation de réservation     | Annulation conditionnelle (rôle client ou réception)  |
+| Check-out                     | Départ, chambres marquées comme à nettoyer            |
+| Liste des chambres à nettoyer | Filtrage des chambres par priorité de nettoyage       |
+| Marquage de chambre nettoyée  | Validation par le personnel de ménage                 |
+
+---
+
+## Schémas d'architecture
+
+
+### Clean Architecture
+![Architecture globale](Diagrams/global-architecture.png)
+
+---
+
+```mermaid
+graph TD
+    Apis[GestionHotel.Apis] --> Application
+    Application --> Domain
+    Application --> PaiementGateways
+    Apis --> Infrastructure
+    Infrastructure --> Domain
+    Infrastructure --> PaiementGateways
+    PaiementGateways[GestionHotel.Externals.PaiementGateways]
+    Domain[GestionHotel.Domain]
+    Application[GestionHotel.Application]
+```
+
+---
+
+## Bonus / Fonctionnalités en cours
+
+* Signalement de casse au check-out (implémentation prévue, structure en place)
+* Notification automatique via service externe (non activé)
+* Statistiques ou dashboard pour la réception
+
+---
+
+## Notes techniques
+
+* Le contexte EF (`HotelDbContext`) est injecté via `Program.cs`
+* L’authentification JWT est configurée dans `Program.cs` avec validation du rôle dans les endpoints
+* Les données d’exemple peuvent être injectées manuellement via SQL ou ajoutées par endpoints
+
+---
+
+## Conclusion
+
+Le projet respecte les principes de Clean Architecture avec séparation stricte des responsabilités. Tous les cas d’usage principaux ont été implémentés, et le système est prêt à être étendu par de nouveaux modules (notifications, dashboard, planning ménage, etc.).
