@@ -4,6 +4,7 @@ using GestionHotel.Domain.Entities;
 using GestionHotel.Domain.Enums;
 using GestionHotel.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using GestionHotel.Application.Common;
 
 namespace GestionHotel.Application.UseCases.Booking;
 

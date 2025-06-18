@@ -1,6 +1,7 @@
 ﻿using GestionHotel.Domain.Interfaces;
 using GestionHotel.Domain.Enums;
 using Microsoft.Extensions.Logging;
+using GestionHotel.Application.Common;
 
 namespace GestionHotel.Application.UseCases.Booking;
 

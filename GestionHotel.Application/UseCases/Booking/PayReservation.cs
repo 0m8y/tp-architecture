@@ -4,6 +4,7 @@ using GestionHotel.Domain.Entities;
 using GestionHotel.Domain.Enums;
 using GestionHotel.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using GestionHotel.Application.Common;
 
 namespace GestionHotel.Application.UseCases.Booking;
 
@@ -74,18 +75,4 @@ public class PayReservation
 
         return Result.Success("Paiement effectué avec succès.");
     }
-}
-
-
-public class Result
-{
-    public bool IsSuccess { get; private set; }
-    public string? ErrorMessage { get; private set; }
-    public string? Message { get; private set; }
-
-    public static Result Success() => new Result { IsSuccess = true };
-
-    public static Result Success(string message) => new Result { IsSuccess = true, Message = message };
-
-    public static Result Failure(string errorMessage) => new Result { IsSuccess = false, ErrorMessage = errorMessage };
 }

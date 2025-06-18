@@ -1,4 +1,5 @@
-﻿using GestionHotel.Domain.Entities;
+﻿using GestionHotel.Application.Common;
+using GestionHotel.Domain.Entities;
 using GestionHotel.Domain.Enums;
 using GestionHotel.Domain.Interfaces;
 using GestionHotel.Domain.Rules;
@@ -16,7 +17,7 @@ public class CreateReservation
         _roomRepository = roomRepository;
     }
 
-    public void Execute(Guid clientId, DateTime startDate, DateTime endDate, List<Guid> roomIds)
+    public Result Execute(Guid clientId, DateTime startDate, DateTime endDate, List<Guid> roomIds)
     {
         var rooms = roomIds
             .Select(id => _roomRepository.GetWithReservationsById(id))
@@ -24,7 +25,7 @@ public class CreateReservation
             .ToList();
 
         if (rooms.Count != roomIds.Count)
-            throw new Exception("Une ou plusieurs chambres sont introuvables.");
+            return Result.Failure("Une ou plusieurs chambres sont introuvables.");
 
         foreach (var room in rooms)
         {
@@ -34,7 +35,7 @@ public class CreateReservation
                 endDate > rr.Reservation.StartDate);
 
             if (overlapping)
-                throw new Exception($"La chambre {room.Number} est déjà réservée.");
+                return Result.Failure($"La chambre {room.Number} est déjà réservée.");
         }
 
         var totalAmount = rooms.Sum(r => RoomTypePricing.GetPrice(r.Type));
@@ -55,5 +56,6 @@ public class CreateReservation
         };
 
         _reservationRepository.Create(reservation);
+        return Result.Success("Réservation créée avec succès.");
     }
 }

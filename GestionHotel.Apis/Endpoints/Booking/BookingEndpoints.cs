@@ -22,8 +22,12 @@ public static class BookingEndpoints
                 CreateReservation useCase) =>
             {
                 var clientId = context.GetClientIdFromToken();
-                useCase.Execute(clientId, request.StartDate, request.EndDate, request.RoomIds);
-                return Results.Ok("Réservation effectuée avec succès.");
+                var result = useCase.Execute(clientId, request.StartDate, request.EndDate, request.RoomIds);
+
+                if (!result.IsSuccess)
+                    return Results.BadRequest(result.ErrorMessage);
+
+                return Results.Ok(result.Message);
             });
 
         group.MapPost("/available-rooms", (
