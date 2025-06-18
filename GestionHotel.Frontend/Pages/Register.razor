@@ -1,10 +1,14 @@
 ﻿@page "/register"
 @implements IDisposable
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject AuthService AuthService
+@inject IJSRuntime JS
 
 <div class="fullscreen-bg"></div>
 <div class="fullscreen-overlay"></div>
 
-<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+<div class="d-flex justify-content-center align-items-center" style="height: 100vh; transform: translateY(-10vh);">
     <div class="login-glass p-4 rounded shadow" style="max-width: 500px; width: 100%;">
         <h3 class="text-center mb-4">Créer un compte</h3>
 
@@ -27,7 +31,7 @@
                 <InputText id="password" type="password" class="form-control" @bind-Value="registerModel.Password" />
             </div>
 
-            <button type="submit" class="btn-login w-100">Créer mon compte</button>
+            <button type="submit" class="btn-login w-100">S'inscrire</button>
         </EditForm>
 
         <p class="text-center mt-3">
@@ -38,6 +42,51 @@
 </div>
 
 @code {
+    private RegisterModel registerModel = new();
+
+    private async Task HandleRegister()
+    {
+        try
+        {
+            // Étape 1 : Création du compte
+            var createResponse = await Http.PostAsJsonAsync("https://localhost:7208/api/v1/clients", registerModel);
+
+            if (createResponse.IsSuccessStatusCode)
+            {
+                Console.WriteLine("✅ Compte créé avec succès.");
+
+                // Étape 2 : Connexion immédiate
+                var loginSuccess = await AuthService.LoginAsync(registerModel.Email, registerModel.Password);
+
+                if (loginSuccess)
+                {
+                    Console.WriteLine("🔐 Connexion automatique réussie.");
+                    Navigation.NavigateTo("/");
+                }
+                else
+                {
+                    Console.WriteLine("❌ Connexion automatique échouée.");
+                    Navigation.NavigateTo("/login");
+                }
+            }
+            else
+            {
+                Console.WriteLine("❌ Échec de l'inscription.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("🚨 Erreur API : " + ex.Message);
+        }
+    }
+
+    public class RegisterModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -49,21 +98,5 @@
     public void Dispose()
     {
         _ = JS.InvokeVoidAsync("document.body.classList.remove", "no-scroll");
-    }
-
-    [Inject] private IJSRuntime JS { get; set; } = default!;
-
-    private RegisterModel registerModel = new();
-
-    private void HandleRegister()
-    {
-        Console.WriteLine($"Inscription : {registerModel.Name} - {registerModel.Email} / {registerModel.Password}");
-    }
-
-    public class RegisterModel
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
     }
 }
