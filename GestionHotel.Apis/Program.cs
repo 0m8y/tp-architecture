@@ -114,6 +114,7 @@ builder.Services.AddScoped<CheckOutReservation>();
 
 builder.Services.AddScoped<GetAvailableRooms>();
 builder.Services.AddScoped<GetRoomsToClean>();
+builder.Services.AddScoped<MarkRoomAsCleaned>();
 
 var app = builder.Build();
 

@@ -182,5 +182,17 @@ public static class BookingEndpoints
         .WithName("GetRoomsToClean")
         .WithOpenApi();
 
+        group.MapPost("/rooms/cleaned", [Authorize(Roles = "Cleaner")] (
+            [FromBody] MarkRoomAsCleanedRequest request,
+            MarkRoomAsCleaned useCase) =>
+        {
+            var result = useCase.Execute(request.RoomId);
+
+            return result.IsSuccess
+                ? Results.Ok(result.Message)
+                : Results.BadRequest(result.ErrorMessage);
+        })
+        .WithName("MarkRoomAsCleaned")
+        .WithOpenApi();
     }
 }
