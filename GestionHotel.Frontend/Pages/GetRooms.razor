@@ -1,6 +1,8 @@
 ﻿@page "/get-rooms"
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject RoomSearchState RoomState
+@using GestionHotel.Frontend.Dto
 @implements IDisposable
 
 <div class="fullscreen-bg"></div>
@@ -85,8 +87,18 @@
 
         if (response.IsSuccessStatusCode)
         {
-            Console.WriteLine("Chambres disponibles récupérées !");
-            // 🔜 Tu pourras afficher les résultats dans cette page ou naviguer vers une autre page avec les résultats
+            var rooms = await response.Content.ReadFromJsonAsync<List<RoomDto>>();
+
+            var filteredRooms = rooms
+                .Where(r =>
+                    r.Capacity >= searchModel.PersonCount &&
+                    (string.IsNullOrWhiteSpace(searchModel.RoomType) ||
+                     r.Type.Equals(searchModel.RoomType, StringComparison.OrdinalIgnoreCase))
+                )
+                .ToList();
+
+            RoomState.SetRooms(filteredRooms);
+            Navigation.NavigateTo("/rooms");
         }
         else
         {

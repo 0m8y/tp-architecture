@@ -15,5 +15,6 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddScoped<CustomAuthStateProvider>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddSingleton<RoomSearchState>();
 
 await builder.Build().RunAsync();
