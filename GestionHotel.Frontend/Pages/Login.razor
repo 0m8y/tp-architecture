@@ -62,13 +62,15 @@
 
         if (success)
         {
-            Navigation.NavigateTo("/");
+            // 🔁 On recharge la page pour forcer la propagation de l’état d’auth
+            Navigation.NavigateTo("/", forceLoad: true);
         }
         else
         {
             Console.WriteLine("Échec de la connexion");
         }
     }
+
 
 
     public class LoginModel

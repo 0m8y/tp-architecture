@@ -1,0 +1,104 @@
+﻿@page "/get-rooms"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<div class="fullscreen-bg"></div>
+<div class="fullscreen-overlay"></div>
+
+<div class="d-flex justify-content-center align-items-center" style="height: 100vh; transform: translateY(-10vh);">
+    <div class="login-glass p-4 rounded shadow w-100" style="max-width: 900px;">
+        <h3 class="text-center mb-4">Rechercher une chambre</h3>
+
+        <EditForm Model="@searchModel" OnValidSubmit="HandleSearch">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Nombre de personnes</label>
+                    <InputSelect class="form-control" @bind-Value="searchModel.PersonCount">
+                        @for (int i = 1; i <= 4; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Type de chambre</label>
+                    <InputSelect class="form-control" @bind-Value="searchModel.RoomType">
+                        <option value="">--</option>
+                        <option value="Simple">Simple</option>
+                        <option value="Double">Double</option>
+                        <option value="Suite">Suite</option>
+                    </InputSelect>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Date d'arrivée</label>
+                    <InputDate class="form-control" @bind-Value="searchModel.StartDate" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Date de départ</label>
+                    <InputDate class="form-control" @bind-Value="searchModel.EndDate" />
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <button class="btn-login w-50" type="submit">Rechercher</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private RoomSearchModel searchModel = new()
+    {
+        PersonCount = 2,
+        StartDate = DateTime.Today.AddDays(1),
+        EndDate = DateTime.Today.AddDays(2)
+    };
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _ = JS.InvokeVoidAsync("document.body.classList.add", "no-scroll");
+        }
+    }
+
+    public void Dispose()
+    {
+        _ = JS.InvokeVoidAsync("document.body.classList.remove", "no-scroll");
+    }
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    private async Task HandleSearch()
+    {
+        var payload = new
+        {
+            startDate = searchModel.StartDate,
+            endDate = searchModel.EndDate
+        };
+
+        var response = await Http.PostAsJsonAsync("https://localhost:7208/api/v1/bookings/available-rooms", payload);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Chambres disponibles récupérées !");
+            // 🔜 Tu pourras afficher les résultats dans cette page ou naviguer vers une autre page avec les résultats
+        }
+        else
+        {
+            Console.WriteLine("Erreur lors de la récupération des chambres.");
+        }
+    }
+
+    public class RoomSearchModel
+    {
+        public int PersonCount { get; set; }
+        public string RoomType { get; set; } = string.Empty;
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+    }
+}
