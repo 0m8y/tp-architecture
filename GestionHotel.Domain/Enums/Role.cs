@@ -3,5 +3,6 @@
 public enum Role
 {
     Client,
-    Receptionist
+    Receptionist,
+    Cleaner
 }
