@@ -1,25 +1,94 @@
-﻿<nav class="navbar navbar-expand-lg navbar-dark bg-primary custom-header px-4">
-    <div class="container-fluid d-flex align-items-center justify-content-between">
-        <!-- Logo à gauche -->
-        <a class="navbar-brand me-4" href="/">
-            <img src="logo.png" alt="Logo Domaine Saphir" height="100" class="logo-img" />
-        </a>
+﻿@using Microsoft.AspNetCore.Components.Authorization
 
-        <!-- Menu central -->
-        <div class="position-absolute start-50 translate-middle-x text-center">
-            <ul class="navbar-nav flex-row gap-4">
-                <li class="nav-item">
-                    <NavLink class="nav-menu" href="/">Accueil</NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-menu" href="/rooms">Chambres</NavLink>
-                </li>
-            </ul>
-        </div>
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+@inject AuthService AuthService
 
-        <!-- Connexion -->
-        <div class="ms-auto">
-            <NavLink class="btn-connexion" href="/login">Connexion</NavLink>
+<CascadingAuthenticationState>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary custom-header px-4">
+        <div class="container-fluid d-flex align-items-center justify-content-between">
+            <!-- Logo à gauche -->
+            <a class="navbar-brand me-4" href="/">
+                <img src="logo.png" alt="Logo Domaine Saphir" height="100" class="logo-img" />
+            </a>
+
+            <!-- Menu central dynamique -->
+            <div class="position-absolute start-50 translate-middle-x text-center">
+                <ul class="navbar-nav flex-row gap-4">
+                    <li class="nav-item">
+                        <NavLink class="nav-menu" href="/">Accueil</NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-menu" href="/rooms">Mes Réservations</NavLink>
+                    </li>
+
+                    @if (IsReceptionist)
+                    {
+                        <li class="nav-item">
+                            <NavLink class="nav-menu" href="/dashboard">Dashboard</NavLink>
+                        </li>
+                    }
+                    @if (IsCleaner)
+                    {
+                        <li class="nav-item">
+                            <NavLink class="nav-menu" href="/cleaning">Tâches</NavLink>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <!-- Connexion / Déconnexion -->
+            <div class="ms-auto">
+                @if (!IsAuthenticated)
+                {
+                    <NavLink class="btn-connexion" href="/login">Connexion</NavLink>
+                }
+                else
+                {
+                    <button class="btn-connexion" @onclick="Logout">Déconnexion</button>
+                }
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
+</CascadingAuthenticationState>
+
+@code {
+    private bool IsAuthenticated;
+    private bool IsReceptionist;
+    private bool IsCleaner;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        IsAuthenticated = user.Identity?.IsAuthenticated ?? false;
+        Console.WriteLine($"[HEADER] Utilisateur authentifié : {IsAuthenticated}");
+
+        if (IsAuthenticated)
+        {
+            foreach (var claim in user.Claims)
+            {
+                Console.WriteLine($"[HEADER] Claim: {claim.Type} = {claim.Value}");
+            }
+
+            IsReceptionist = user.IsInRole("Receptionist");
+            IsCleaner = user.IsInRole("Cleaner");
+
+            Console.WriteLine($"[HEADER] EstReceptionist : {IsReceptionist}");
+            Console.WriteLine($"[HEADER] EstCleaner     : {IsCleaner}");
+        }
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+
+        if (AuthenticationStateProvider is CustomAuthStateProvider customProvider)
+        {
+            customProvider.NotifyUserLogout();
+        }
+
+        Navigation.NavigateTo("/", forceLoad: true);
+    }
+}

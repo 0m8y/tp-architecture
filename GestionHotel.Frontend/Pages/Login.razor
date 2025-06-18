@@ -1,6 +1,8 @@
 ﻿@page "/login"
 @implements IDisposable
 @inject HttpClient Http
+@inject AuthService AuthService
+@inject NavigationManager Navigation
 
 <div class="fullscreen-bg"></div>
 <div class="fullscreen-overlay"></div>
@@ -54,28 +56,20 @@
 @code {
     private LoginModel loginModel = new();
 
-    private async void HandleLogin()
+    private async Task HandleLogin()
     {
-        try
-        {
-            var response = await Http.PostAsJsonAsync("https://localhost:7208/api/v1/clients/login", loginModel);
+        var success = await AuthService.LoginAsync(loginModel.Email, loginModel.Password);
 
-            if (response.IsSuccessStatusCode)
-            {
-                // Ex : récupération du token ou redirection
-                var token = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("Login réussi. Token : " + token);
-            }
-            else
-            {
-                Console.WriteLine("Échec de la connexion");
-            }
-        }
-        catch (Exception ex)
+        if (success)
         {
-            Console.WriteLine("Erreur API : " + ex.Message);
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            Console.WriteLine("Échec de la connexion");
         }
     }
+
 
     public class LoginModel
     {
