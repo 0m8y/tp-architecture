@@ -39,7 +39,7 @@ public class CheckOutReservation
         //     _logger.LogInformation("Frais supplémentaires appliqués pour la réservation {ReservationId}", reservation.Id);
         // }
 
-        reservation.Status = ReservationStatus.Completed;
+        reservation.Status = ReservationStatus.CheckOut;
         _reservationRepository.Update(reservation);
 
         _logger.LogInformation("Check-out effectué pour la réservation {ReservationId}", reservation.Id);

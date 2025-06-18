@@ -163,5 +163,24 @@ public static class BookingEndpoints
                 ? Results.Ok(result.Message)
                 : Results.BadRequest(result.ErrorMessage);
         });
+
+        group.MapGet("/rooms-to-clean", [Authorize(Roles = "Cleaner")] (
+            GetRoomsToClean useCase) =>
+        {
+            var result = useCase.Execute();
+
+            var dtos = result.Select(r => new RoomToCleanDto
+            {
+                RoomId = r.RoomId,
+                RoomNumber = r.RoomNumber,
+                LastOccupied = r.LastOccupied,
+                NextOccupied = r.NextOccupied
+            });
+
+            return Results.Ok(dtos);
+        })
+        .WithName("GetRoomsToClean")
+        .WithOpenApi();
+
     }
 }

@@ -10,6 +10,7 @@ using GestionHotel.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -70,7 +71,8 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
         ValidateIssuer = false,
-        ValidateAudience = false
+        ValidateAudience = false,
+        RoleClaimType = ClaimTypes.Role
     };
 });
 
@@ -102,7 +104,6 @@ builder.Services.AddScoped<IPaymentGatewayFactory, PaymentGatewayFactory>();
 
 builder.Services.AddScoped<CreateClient>();
 builder.Services.AddScoped<LoginClient>();
-builder.Services.AddScoped<GetAvailableRooms>();
 
 builder.Services.AddScoped<CreateReservation>();
 builder.Services.AddScoped<GetReservationsByClient>();
@@ -110,6 +111,9 @@ builder.Services.AddScoped<PayReservation>();
 builder.Services.AddScoped<CancelReservation>();
 builder.Services.AddScoped<CheckInReservation>();
 builder.Services.AddScoped<CheckOutReservation>();
+
+builder.Services.AddScoped<GetAvailableRooms>();
+builder.Services.AddScoped<GetRoomsToClean>();
 
 var app = builder.Build();
 

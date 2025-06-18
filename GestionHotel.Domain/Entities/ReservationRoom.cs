@@ -7,4 +7,6 @@ public class ReservationRoom
 
     public Guid RoomId { get; set; }
     public Room Room { get; set; } = null!;
+
+    public bool IsCleaned { get; set; }
 }

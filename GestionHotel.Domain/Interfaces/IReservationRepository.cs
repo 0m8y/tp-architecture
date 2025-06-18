@@ -9,4 +9,6 @@ public interface IReservationRepository
     void Cancel(Guid reservationId);
     void Update(Reservation reservation);
     List<Reservation> GetByClientId(Guid clientId);
+
+    List<Reservation> GetAll();
 }

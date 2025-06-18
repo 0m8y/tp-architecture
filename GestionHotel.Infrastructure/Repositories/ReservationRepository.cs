@@ -51,4 +51,12 @@ public class ReservationRepository : IReservationRepository
             .Where(r => r.ClientId == clientId)
             .ToList();
     }
+
+    public List<Reservation> GetAll()
+    {
+        return _context.Reservations
+            .Include(r => r.ReservationRooms)
+                .ThenInclude(rr => rr.Room)
+            .ToList();
+    }
 }

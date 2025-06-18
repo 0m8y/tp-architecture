@@ -32,7 +32,7 @@ public class CancelReservation
         if (reservation.Status == ReservationStatus.Cancelled)
             return Result.Failure("Réservation déjà annulée.");
 
-        if (reservation.Status == ReservationStatus.Completed)
+        if (reservation.Status == ReservationStatus.CheckOut)
             return Result.Failure("Réservation déjà terminée.");
 
         if (reservation.Status == ReservationStatus.CheckIn)

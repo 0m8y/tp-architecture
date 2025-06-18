@@ -6,5 +6,5 @@ public enum ReservationStatus
     Confirmed,
     Cancelled,
     CheckIn,
-    Completed
+    CheckOut
 }
