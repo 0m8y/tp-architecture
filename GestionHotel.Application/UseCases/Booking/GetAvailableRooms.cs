@@ -1,8 +1,6 @@
 ﻿using GestionHotel.Domain.Entities;
 using GestionHotel.Domain.Interfaces;
 
-namespace GestionHotel.Application.UseCases.Booking;
-
 public class GetAvailableRooms
 {
     private readonly IRoomRepository _roomRepository;

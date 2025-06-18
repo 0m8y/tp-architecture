@@ -1,8 +1,6 @@
 ﻿using GestionHotel.Apis.DTOs;
 using GestionHotel.Apis.Helpers;
 using GestionHotel.Application.UseCases.Booking;
-using GestionHotel.Domain.Enums;
-using GestionHotel.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniValidation;
@@ -27,12 +25,41 @@ public static class BookingEndpoints
                 return Results.Ok("Réservation effectuée avec succès.");
             });
 
-        group.MapPost("/available-rooms", async (
+        group.MapPost("/available-rooms", (
             [FromBody] GetAvailableRoomsRequest request,
-            [FromServices] GetAvailableRooms useCase) =>
+            HttpContext context,
+            GetAvailableRooms useCase) =>
         {
             var rooms = useCase.Execute(request.StartDate, request.EndDate);
-            return Results.Ok(rooms);
+
+            var isReceptionist = context.User?.Identity?.IsAuthenticated == true
+                                 && context.User.IsInRole("Receptionist");
+
+            if (isReceptionist)
+            {
+                var detailed = rooms.Select(r => new AvailableRoomForReceptionistDto
+                {
+                    Id = r.Id,
+                    Number = r.Number,
+                    Capacity = r.Capacity,
+                    Type = r.Type,
+                    Condition = r.Condition
+                });
+
+                return Results.Ok(detailed);
+            }
+            else
+            {
+                var basic = rooms.Select(r => new AvailableRoomForClientDto
+                {
+                    Id = r.Id,
+                    Number = r.Number,
+                    Capacity = r.Capacity,
+                    Type = r.Type,
+                });
+
+                return Results.Ok(basic);
+            }
         })
         .WithName("GetAvailableRooms")
         .WithOpenApi();
