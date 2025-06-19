@@ -75,35 +75,10 @@
 
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
-    private async Task HandleSearch()
+    private void HandleSearch()
     {
-        var payload = new
-        {
-            startDate = searchModel.StartDate,
-            endDate = searchModel.EndDate
-        };
-
-        var response = await Http.PostAsJsonAsync("https://localhost:7208/api/v1/bookings/available-rooms", payload);
-
-        if (response.IsSuccessStatusCode)
-        {
-            var rooms = await response.Content.ReadFromJsonAsync<List<RoomDto>>();
-
-            var filteredRooms = rooms
-                .Where(r =>
-                    r.Capacity >= searchModel.PersonCount &&
-                    (string.IsNullOrWhiteSpace(searchModel.RoomType) ||
-                     r.Type.Equals(searchModel.RoomType, StringComparison.OrdinalIgnoreCase))
-                )
-                .ToList();
-
-            RoomState.SetRooms(filteredRooms);
-            Navigation.NavigateTo("/rooms");
-        }
-        else
-        {
-            Console.WriteLine("Erreur lors de la récupération des chambres.");
-        }
+        var query = $"?startDate={searchModel.StartDate:yyyy-MM-dd}&endDate={searchModel.EndDate:yyyy-MM-dd}&personCount={searchModel.PersonCount}&roomType={searchModel.RoomType}";
+        Navigation.NavigateTo("/rooms" + query);
     }
 
     public class RoomSearchModel

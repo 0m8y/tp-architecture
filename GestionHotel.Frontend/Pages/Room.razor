@@ -1,0 +1,111 @@
+﻿@page "/room/{RoomId:guid}"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@using GestionHotel.Frontend.Dto
+@using System.Web
+
+<div class="container py-5">
+    @if (isLoading)
+    {
+        <div class="text-center">Chargement...</div>
+    }
+    else if (!isAvailable)
+    {
+        <div class="alert alert-danger text-center">
+            Cette chambre n'est plus disponible aux dates choisies.
+        </div>
+    }
+    else if (room != null)
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <img src="@($"/rooms/{RoomId}.jpg")" class="img-fluid rounded shadow" />
+            </div>
+            <div class="col-md-6">
+                <h2>Chambre @room.Type – @room.Capacity @(room.Capacity > 1 ? "personnes" : "personne")</h2>
+
+                <div class="mb-3">
+                    <label>Date d'arrivée :</label>
+                    <InputDate @bind-Value="startDate" class="form-control" @onchange="CheckAvailability" />
+                </div>
+                <div class="mb-3">
+                    <label>Date de départ :</label>
+                    <InputDate @bind-Value="endDate" class="form-control" @onchange="CheckAvailability" />
+                </div>
+
+                @if (startDate.HasValue && endDate.HasValue)
+                {
+                    <p class="fw-bold fs-5 mt-3">
+                        Prix total : @((endDate.Value - startDate.Value).Days * PrixParNuit) €
+                    </p>
+                }
+
+                <button class="btn btn-main" disabled="@(isAvailable ? null : true)">Réserver</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Guid RoomId { get; set; }
+
+    private RoomDto? room;
+    private bool isLoading = true;
+    private bool isAvailable = true;
+    private const int PrixParNuit = 80;
+
+    private DateTime? startDate;
+    private DateTime? endDate;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        var query = HttpUtility.ParseQueryString(uri.Query);
+
+        startDate = DateTime.TryParse(query["startDate"], out var sd) ? sd : null;
+        endDate = DateTime.TryParse(query["endDate"], out var ed) ? ed : null;
+
+        await LoadRoom();
+        await CheckAvailability();
+        isLoading = false;
+    }
+
+    private async Task LoadRoom()
+    {
+        var response = await Http.PostAsJsonAsync("https://localhost:7208/api/v1/bookings/available-rooms", GetPayload());
+
+        if (response.IsSuccessStatusCode)
+        {
+            var rooms = await response.Content.ReadFromJsonAsync<List<RoomDto>>() ?? new();
+            room = rooms.FirstOrDefault(r => r.Id == RoomId);
+        }
+    }
+
+    private async Task CheckAvailability(ChangeEventArgs? e = null)
+    {
+        if (!startDate.HasValue || !endDate.HasValue)
+        {
+            isAvailable = true; // on autorise l'affichage sans dates
+            return;
+        }
+
+        var response = await Http.PostAsJsonAsync("https://localhost:7208/api/v1/bookings/available-rooms", GetPayload());
+
+        if (response.IsSuccessStatusCode)
+        {
+            var rooms = await response.Content.ReadFromJsonAsync<List<RoomDto>>() ?? new();
+            isAvailable = rooms.Any(r => r.Id == RoomId);
+        }
+        else
+        {
+            isAvailable = false;
+        }
+    }
+
+    private object GetPayload()
+    {
+        return (startDate.HasValue && endDate.HasValue)
+            ? new { startDate, endDate }
+            : new { };
+    }
+}

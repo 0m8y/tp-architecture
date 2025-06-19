@@ -1,0 +1,93 @@
+﻿    @page "/rooms"
+    @inject HttpClient Http
+    @inject NavigationManager Navigation
+    @using GestionHotel.Frontend.Dto
+    @using System.Web
+
+    <div class="container py-5">
+        <h2 class="text-center mb-5">Chambres disponibles</h2>
+
+        @if (isLoading)
+        {
+            <div class="text-center">Chargement...</div>
+        }
+        else if (rooms == null || !rooms.Any())
+        {
+            <div class="alert alert-info text-center">
+                Aucune chambre trouvée. <NavLink href="/get-rooms">Effectuez une nouvelle recherche</NavLink>.
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+            @foreach (var room in rooms)
+            {
+                var roomUrl = $"/room/{room.Id}";
+                if (startDate.HasValue && endDate.HasValue)
+                {
+                    roomUrl += $"?startDate={startDate.Value:yyyy-MM-dd}&endDate={endDate.Value:yyyy-MM-dd}";
+                }
+
+                <div class="col-md-4 col-sm-6">
+                    <NavLink href="@roomUrl" class="text-decoration-none text-dark">
+                        <div class="card shadow-sm h-100">
+                            <img src="@($"/rooms/{room.Id}.jpg")" class="card-img-top" alt="Chambre" style="object-fit: cover; height: 200px;">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Chambre @room.Type – @room.Capacity @(room.Capacity > 1 ? "personnes" : "personne")</h5>
+                            </div>
+                        </div>
+                    </NavLink>
+                </div>
+            }
+            </div>
+        }
+    </div>
+
+    @code {
+        private List<RoomDto>? rooms;
+        private bool isLoading = true;
+        private DateTime? startDate;
+        private DateTime? endDate;
+
+
+        protected override async Task OnInitializedAsync()
+        {
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+            var query = HttpUtility.ParseQueryString(uri.Query);
+
+            string? startDateStr = query["startDate"];
+            string? endDateStr = query["endDate"];
+            string? personCountStr = query["personCount"];
+            string? roomTypeStr = query["roomType"];
+
+            startDate = DateTime.TryParse(startDateStr, out var sd) ? sd : null;
+            endDate = DateTime.TryParse(endDateStr, out var ed) ? ed : null;
+            int? personCount = int.TryParse(personCountStr, out var pc) ? pc : null;
+
+            object payload = (startDate.HasValue && endDate.HasValue)
+                ? new { startDate, endDate }
+                : new { };
+
+            var response = await Http.PostAsJsonAsync("https://localhost:7208/api/v1/bookings/available-rooms", payload);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var allRooms = await response.Content.ReadFromJsonAsync<List<RoomDto>>() ?? new();
+
+                RoomTypeDto? filterRoomType = null;
+                if (!string.IsNullOrWhiteSpace(roomTypeStr) &&
+                    Enum.TryParse<RoomTypeDto>(roomTypeStr, true, out var parsed))
+                {
+                    filterRoomType = parsed;
+                }
+                rooms = allRooms
+                    .Where(r =>
+                        (!personCount.HasValue || r.Capacity >= personCount.Value) &&
+                        (!filterRoomType.HasValue || r.Type.Equals(filterRoomType.Value.ToString(), StringComparison.OrdinalIgnoreCase))
+                    )
+                    .ToList();
+            }
+
+            isLoading = false;
+        }
+    }
