@@ -25,16 +25,15 @@ public class AuthService
         if (!response.IsSuccessStatusCode)
             return false;
 
-        var token = await response.Content.ReadAsStringAsync();
-        await _localStorage.SetItemAsync("authToken", token);
+        var tokenResponse = await response.Content.ReadFromJsonAsync<TokenDto>();
+        await _localStorage.SetItemAsync("authToken", tokenResponse!.Token);
 
-        // ✅ Cast sécurisé
         if (_authStateProvider is CustomAuthStateProvider customProvider)
         {
-            customProvider.NotifyUserAuthentication(token);
+            customProvider.NotifyUserAuthentication(tokenResponse.Token);
         }
 
-        _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenResponse.Token);
         return true;
     }
 

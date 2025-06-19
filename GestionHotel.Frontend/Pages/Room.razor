@@ -1,19 +1,19 @@
 ﻿@page "/room/{RoomId:guid}"
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
 @using GestionHotel.Frontend.Dto
 @using System.Web
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Net.Http.Json
+@using Blazored.LocalStorage;
+@inject AuthorizedHttpClient AuthClient
+@inject ILocalStorageService LocalStorage
 
 <div class="container py-5">
     @if (isLoading)
     {
         <div class="text-center">Chargement...</div>
-    }
-    else if (!isAvailable)
-    {
-        <div class="alert alert-danger text-center">
-            Cette chambre n'est plus disponible aux dates choisies.
-        </div>
     }
     else if (room != null)
     {
@@ -26,11 +26,15 @@
 
                 <div class="mb-3">
                     <label>Date d'arrivée :</label>
-                    <InputDate @bind-Value="startDate" class="form-control" @onchange="CheckAvailability" />
+                    <InputDate @bind-Value="startDate"
+                               class="form-control"
+                               @oninput="HandleStartDateChange" />
                 </div>
                 <div class="mb-3">
                     <label>Date de départ :</label>
-                    <InputDate @bind-Value="endDate" class="form-control" @onchange="CheckAvailability" />
+                    <InputDate @bind-Value="endDate"
+                               class="form-control"
+                               @oninput="HandleEndDateChange" />
                 </div>
 
                 @if (startDate.HasValue && endDate.HasValue)
@@ -40,7 +44,55 @@
                     </p>
                 }
 
-                <button class="btn btn-main" disabled="@(isAvailable ? null : true)">Réserver</button>
+                <button class="btn btn-main"
+                        disabled="@(!isAvailable || !startDate.HasValue || !endDate.HasValue)"
+                        @onclick="HandleReservation">
+                    @(isAvailable ? "Réserver" : "Indisponible")
+                </button>
+            </div>
+        </div>
+    }
+
+    @if (showConfirmPopup)
+    {
+        <div class="modal show d-block" style="background-color: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmer la réservation</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" @bind="termsAccepted" />
+                            <label class="form-check-label">J'accepte les conditions d'utilisation.</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @onclick="() => showConfirmPopup = false">Annuler</button>
+                        <button class="btn btn-primary" @onclick="ConfirmReservation" disabled="@(termsAccepted ? null : true)">Confirmer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (showResultPopup)
+    {
+        <div class="modal show d-block" style="background-color: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Réservation confirmée</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Votre réservation est confirmée et en attente de paiement.</p>
+                        <small>* Vous pouvez choisir de payer maintenant ou le jour de votre arrivée.</small>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success" @onclick="PayNow">Payer maintenant</button>
+                        <button class="btn btn-secondary" @onclick="FinishWithoutPayment">Payer plus tard</button>
+                    </div>
+                </div>
             </div>
         </div>
     }
@@ -54,11 +106,68 @@
     private bool isAvailable = true;
     private const int PrixParNuit = 80;
 
-    private DateTime? startDate;
-    private DateTime? endDate;
+    private DateTime? _startDate;
+    private DateTime? _endDate;
+
+    private DateTime? startDate
+    {
+        get => _startDate;
+        set
+        {
+            _startDate = value;
+            UpdateUrl();
+            _ = CheckAvailability();
+        }
+    }
+
+    private DateTime? endDate
+    {
+        get => _endDate;
+        set
+        {
+            _endDate = value;
+            UpdateUrl();
+            _ = CheckAvailability();
+        }
+    }
+
+    private async Task HandleStartDateChange(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out var newDate))
+        {
+            _startDate = newDate;
+            UpdateUrl();
+            await CheckAvailability();
+        }
+    }
+
+    private async Task HandleEndDateChange(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out var newDate))
+        {
+            _endDate = newDate;
+            UpdateUrl();
+            await CheckAvailability();
+        }
+    }
+
+    private void UpdateUrl()
+    {
+        if (startDate.HasValue && endDate.HasValue)
+        {
+            var query = $"?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}";
+            Navigation.NavigateTo($"/room/{RoomId}{query}", replace: true);
+        }
+    }
+
+    private bool showConfirmPopup = false;
+    private bool showResultPopup = false;
+    private bool termsAccepted = false;
 
     protected override async Task OnInitializedAsync()
     {
+        await AuthClient.InitAsync(LocalStorage);
+
         var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
         var query = HttpUtility.ParseQueryString(uri.Query);
 
@@ -85,7 +194,7 @@
     {
         if (!startDate.HasValue || !endDate.HasValue)
         {
-            isAvailable = true; // on autorise l'affichage sans dates
+            isAvailable = true;
             return;
         }
 
@@ -107,5 +216,64 @@
         return (startDate.HasValue && endDate.HasValue)
             ? new { startDate, endDate }
             : new { };
+    }
+
+    private async Task HandleReservation()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity == null || !user.Identity.IsAuthenticated)
+        {
+            var query = $"?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}";
+            Navigation.NavigateTo($"/login?redirectUri=/room/{RoomId}{query}");
+            return;
+        }
+
+        showConfirmPopup = true;
+    }
+
+    private async Task ConfirmReservation()
+    {
+        showConfirmPopup = false;
+
+        var reservationRequest = new
+        {
+            roomIds = new[] { RoomId },
+            startDate = startDate?.ToString("yyyy-MM-ddTHH:mm:ss"),
+            endDate = endDate?.ToString("yyyy-MM-ddTHH:mm:ss")
+        };
+
+        Console.WriteLine($"RoomId : {RoomId} | startDate : {startDate} | endDate : {endDate}");
+        var token = await LocalStorage.GetItemAsync<string>("authToken");
+        Console.WriteLine($"TOKEN: {token}");
+        var response = await AuthClient.Client.PostAsJsonAsync("https://localhost:7208/api/v1/bookings/booking", reservationRequest);
+
+        if (response.IsSuccessStatusCode)
+        {
+            showResultPopup = true;
+
+            var reservation = await response.Content.ReadFromJsonAsync<ReservationDto>();
+            Console.WriteLine($"Réservation enregistrée : {System.Text.Json.JsonSerializer.Serialize(reservation)}");
+        }
+    }
+
+    private void PayNow()
+    {
+        showResultPopup = false;
+        Navigation.NavigateTo("/payment"); // plus tard, route réelle
+    }
+
+    private void FinishWithoutPayment()
+    {
+        showResultPopup = false;
+        Navigation.NavigateTo("/my-reservations"); // ou simplement rester sur la page
+    }
+
+    public class ReservationDto
+    {
+        public Guid Id { get; set; }
+        public bool IsPaid { get; set; }
+        public string Status { get; set; } = string.Empty;
     }
 }
