@@ -8,6 +8,7 @@ public class ReservationDto
     public decimal TotalAmount { get; set; }
     public bool IsPaid { get; set; }
     public string Status { get; set; } = string.Empty;
-    public List<string> RoomNumbers { get; set; } = new();
+    public List<Guid> RoomIds { get; set; } = new();
+
 }
 

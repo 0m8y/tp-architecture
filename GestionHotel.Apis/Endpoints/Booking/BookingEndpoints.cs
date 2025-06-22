@@ -36,8 +36,9 @@ public static class BookingEndpoints
                     TotalAmount = reservation.TotalAmount,
                     IsPaid = reservation.IsPaid,
                     Status = reservation.Status.ToString(),
-                    RoomNumbers = reservation.ReservationRooms
-                        .Select(rr => rr.Room?.Number ?? "")
+                    RoomIds = reservation.ReservationRooms
+                        .Select(rr => rr.RoomId)
+                        .Distinct()
                         .ToList()
                 };
 
@@ -102,8 +103,8 @@ public static class BookingEndpoints
                 TotalAmount = r.TotalAmount,
                 IsPaid = r.IsPaid,
                 Status = r.Status.ToString(),
-                RoomNumbers = r.ReservationRooms
-                    .Select(rr => rr.Room.Number)
+                RoomIds = r.ReservationRooms
+                    .Select(rr => rr.RoomId)
                     .Distinct()
                     .ToList()
             }).ToList();
