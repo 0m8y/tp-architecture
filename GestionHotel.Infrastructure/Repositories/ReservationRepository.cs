@@ -59,4 +59,12 @@ public class ReservationRepository : IReservationRepository
                 .ThenInclude(rr => rr.Room)
             .ToList();
     }
+    public Reservation? GetByReservationId(Guid reservationId)
+    {
+        return _context.Reservations
+            .Include(r => r.ReservationRooms)
+            .ThenInclude(rr => rr.Room)
+            .FirstOrDefault(r => r.Id == reservationId);
+    }
+
 }

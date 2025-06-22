@@ -1,0 +1,125 @@
+﻿
+@page "/payment/{ReservationId:guid}"
+@inject AuthorizedHttpClient AuthClient
+@inject NavigationManager Navigation
+@using GestionHotel.Frontend.Dto
+@using System.Net.Http.Json
+@using Blazored.LocalStorage
+@inject ILocalStorageService LocalStorage
+
+<h2 class="mb-4">Paiement de votre réservation</h2>
+
+@if (successMessage != null)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+else if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else if (reservation != null)
+{
+    <p><strong>Montant à payer :</strong> @reservation.TotalAmount.ToString("F2") €</p>
+
+
+    <EditForm Model="@formModel" OnValidSubmit="HandlePayment">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="cardNumber">Numéro de carte</label>
+            <InputText id="cardNumber" class="form-control" @bind-Value="formModel.CardNumber" />
+        </div>
+
+        <div class="mb-3">
+            <label for="expiryDate">Date d’expiration (MM/YY)</label>
+            <InputText id="expiryDate" class="form-control" @bind-Value="formModel.ExpiryDate" />
+        </div>
+
+        <div class="mb-3">
+            <label>Choisissez votre prestataire de paiement</label>
+            <div class="d-flex gap-3 mt-2">
+                <img src="/Icons/stripe.png"
+                     class="provider-logo @(formModel.Provider == "Stripe" ? "selected" : "")"
+                     @onclick="@(() => formModel.Provider = "Stripe")" />
+
+                <img src="/Icons/paypal.png"
+                     class="provider-logo @(formModel.Provider == "Paypal" ? "selected" : "")"
+                     @onclick="@(() => formModel.Provider = "Paypal")" />
+
+            </div>
+        </div>
+        <button class="btn btn-main" type="submit">Payer</button>
+    </EditForm>
+}
+else
+{
+    <p>Chargement des informations de réservation...</p>
+}
+
+<style>
+    .provider-logo {
+        width: 100px;
+        height: auto;
+        border: 2px solid transparent;
+        cursor: pointer;
+        border-radius: 8px;
+    }
+
+        .provider-logo.selected {
+            border-color: #007bff;
+            box-shadow: 0 0 5px #007bff;
+        }
+</style>
+
+@code {
+    [Parameter] public Guid ReservationId { get; set; }
+
+    private string? successMessage;
+    private string? errorMessage;
+    private ReservationDto? reservation;
+
+    private PayReservationDto formModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            reservation = await AuthClient.Client
+                .GetFromJsonAsync<ReservationDto>($"https://localhost:7208/api/v1/bookings/reservations/{ReservationId}");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erreur de chargement : {ex.Message}";
+        }
+    }
+
+    private async Task HandlePayment()
+    {
+        successMessage = null;
+        errorMessage = null;
+
+        try
+        {
+            var response = await AuthClient.Client.PostAsJsonAsync(
+                $"https://localhost:7208/api/v1/bookings/reservations/{ReservationId}/pay",
+                formModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = "Paiement effectué avec succès !";
+                await Task.Delay(3000);
+                Navigation.NavigateTo("/reservations");
+            }
+            else
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                errorMessage = $"Erreur : {content}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erreur : {ex.Message}";
+        }
+    }
+}

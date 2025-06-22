@@ -40,7 +40,11 @@ else
                             <p class="card-text">
                                 @($"{reservation.RoomIds.Count} chambre(s) – Statut : {reservation.Status}")
                             </p>
-                            <p class="card-text"><small class="text-muted">@($"{reservation.TotalAmount} € – {(reservation.IsPaid ? "Payée" : "En attente de paiement")}")</small></p>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    @($"{reservation.TotalAmount:F2} € – {(reservation.IsPaid ? "Payée" : "En attente de paiement")}")
+                                </small>
+                            </p>
                         </div>
                     </div>
                 </div>

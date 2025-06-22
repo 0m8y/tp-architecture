@@ -40,7 +40,7 @@
                 @if (startDate.HasValue && endDate.HasValue)
                 {
                     <p class="fw-bold fs-5 mt-3">
-                        Prix total : @((endDate.Value - startDate.Value).Days * PrixParNuit) €
+                        Prix total : @(((endDate.Value - startDate.Value).Days * PrixParNuit).ToString("F2")) €
                     </p>
                 }
 
@@ -68,8 +68,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-secondary" @onclick="() => showConfirmPopup = false">Annuler</button>
-                        <button class="btn btn-primary" @onclick="ConfirmReservation" disabled="@(termsAccepted ? null : true)">Confirmer</button>
+                        <button class="btn btn-connexion" @onclick="() => showConfirmPopup = false">Annuler</button>
+                        <button class="btn btn-main" @onclick="ConfirmReservation" disabled="@(termsAccepted ? null : true)">Confirmer</button>
                     </div>
                 </div>
             </div>
@@ -90,7 +90,7 @@
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-success" @onclick="PayNow">Payer maintenant</button>
-                        <button class="btn btn-secondary" @onclick="FinishWithoutPayment">Payer plus tard</button>
+                        <button class="btn btn-main" @onclick="FinishWithoutPayment">Payer plus tard</button>
                     </div>
                 </div>
             </div>
@@ -163,6 +163,7 @@
     private bool showConfirmPopup = false;
     private bool showResultPopup = false;
     private bool termsAccepted = false;
+    private Guid? createdReservationId = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -254,6 +255,7 @@
             showResultPopup = true;
 
             var reservation = await response.Content.ReadFromJsonAsync<ReservationDto>();
+            createdReservationId = reservation?.Id;
             Console.WriteLine($"Réservation enregistrée : {System.Text.Json.JsonSerializer.Serialize(reservation)}");
         }
     }
@@ -261,7 +263,9 @@
     private void PayNow()
     {
         showResultPopup = false;
-        Navigation.NavigateTo("/payment"); // plus tard, route réelle
+
+        if (createdReservationId.HasValue)
+            Navigation.NavigateTo($"/payment/{createdReservationId}");
     }
 
     private void FinishWithoutPayment()

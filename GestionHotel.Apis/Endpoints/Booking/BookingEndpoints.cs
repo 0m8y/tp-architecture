@@ -2,6 +2,7 @@
 using GestionHotel.Apis.Helpers;
 using GestionHotel.Application.UseCases.Booking;
 using GestionHotel.Domain.Enums;
+using GestionHotel.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniValidation;
@@ -110,6 +111,40 @@ public static class BookingEndpoints
             }).ToList();
 
             return Results.Ok(dtos);
+        });
+
+        group.MapGet("/reservations/{id:guid}", [Authorize] async (
+            Guid id,
+            HttpContext context,
+            IReservationRepository reservationRepository) =>
+        {
+            var userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var role = context.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+            if (userId is null || role is null)
+                return Results.Unauthorized();
+
+            var reservation = reservationRepository.GetByReservationId(id);
+            if (reservation is null)
+                return Results.NotFound();
+
+            if (role != "Receptionist" && reservation.ClientId.ToString() != userId)
+                return Results.Forbid();
+
+            var dto = new ReservationDto
+            {
+                Id = reservation.Id,
+                StartDate = reservation.StartDate,
+                EndDate = reservation.EndDate,
+                TotalAmount = reservation.TotalAmount,
+                IsPaid = reservation.IsPaid,
+                Status = reservation.Status.ToString(),
+                RoomIds = reservation.ReservationRooms
+                    .Select(r => r.RoomId)
+                    .ToList()
+            };
+
+            return Results.Ok(dto);
         });
 
         group.MapPost("/reservations/{id:guid}/pay", [Authorize] async (

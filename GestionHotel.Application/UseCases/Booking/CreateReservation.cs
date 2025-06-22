@@ -38,7 +38,11 @@ public class CreateReservation
                 return Result<Reservation>.Failure($"La chambre {room.Number} est déjà réservée.");
         }
 
-        var totalAmount = rooms.Sum(r => RoomTypePricing.GetPrice(r.Type));
+        var nights = (endDate.Date - startDate.Date).Days;
+        if (nights <= 0)
+            return Result<Reservation>.Failure("La date de départ doit être après la date d'arrivée.");
+
+        var totalAmount = rooms.Sum(r => RoomTypePricing.GetPrice(r.Type) * nights);
 
         var reservation = new Reservation
         {
