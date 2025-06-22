@@ -1,0 +1,76 @@
+﻿@page "/reservations"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+@using Blazored.LocalStorage;
+@inject ILocalStorageService LocalStorage
+@inject AuthorizedHttpClient AuthClient
+
+@using System.Net.Http.Json
+@using GestionHotel.Frontend.Dto
+@using Microsoft.AspNetCore.Components.Authorization
+
+<h2 class="text-center my-4">Mes réservations</h2>
+
+@if (isLoading)
+{
+    <div class="text-center">Chargement...</div>
+}
+else if (reservations == null || !reservations.Any())
+{
+    <div class="alert alert-info text-center">
+        Vous n'avez pas encore de réservations.
+    </div>
+}
+else
+{
+    <div class="container">
+        @foreach (var reservation in reservations)
+        {
+            <div class="card mb-4 shadow-sm">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="@GetImagePath(reservation)" class="img-fluid rounded-start" style="object-fit: cover; height: 100%;" />
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Réservation du @reservation.StartDate.ToString("dd/MM/yyyy") au @reservation.EndDate.ToString("dd/MM/yyyy")
+                            </h5>
+                            <p class="card-text">
+                                @($"{reservation.RoomNumbers.Count} chambre(s) – Statut : {reservation.Status}")
+                            </p>
+                            <p class="card-text"><small class="text-muted">@($"{reservation.TotalAmount} € – {(reservation.IsPaid ? "Payée" : "En attente de paiement")}")</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<ReservationDto>? reservations;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthClient.InitAsync(LocalStorage);
+
+        var response = await AuthClient.Client.GetAsync("https://localhost:7208/api/v1/bookings/my-reservations");
+
+        if (response.IsSuccessStatusCode)
+        {
+            reservations = await response.Content.ReadFromJsonAsync<List<ReservationDto>>();
+        }
+
+        isLoading = false;
+    }
+
+    private string GetImagePath(ReservationDto reservation)
+    {
+        return reservation.RoomNumbers != null && reservation.RoomNumbers.Any()
+            ? $"/rooms/{reservation.RoomNumbers.First()}.jpg"
+            : "/img/default-room.jpg";
+    }
+}

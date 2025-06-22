@@ -17,7 +17,7 @@ public class CreateReservation
         _roomRepository = roomRepository;
     }
 
-    public Result Execute(Guid clientId, DateTime startDate, DateTime endDate, List<Guid> roomIds)
+    public Result<Reservation> Execute(Guid clientId, DateTime startDate, DateTime endDate, List<Guid> roomIds)
     {
         var rooms = roomIds
             .Select(id => _roomRepository.GetWithReservationsById(id))
@@ -25,7 +25,7 @@ public class CreateReservation
             .ToList();
 
         if (rooms.Count != roomIds.Count)
-            return Result.Failure("Une ou plusieurs chambres sont introuvables.");
+            return Result<Reservation>.Failure("Une ou plusieurs chambres sont introuvables.");
 
         foreach (var room in rooms)
         {
@@ -35,7 +35,7 @@ public class CreateReservation
                 endDate > rr.Reservation.StartDate);
 
             if (overlapping)
-                return Result.Failure($"La chambre {room.Number} est déjà réservée.");
+                return Result<Reservation>.Failure($"La chambre {room.Number} est déjà réservée.");
         }
 
         var totalAmount = rooms.Sum(r => RoomTypePricing.GetPrice(r.Type));
@@ -56,6 +56,6 @@ public class CreateReservation
         };
 
         _reservationRepository.Create(reservation);
-        return Result.Success("Réservation créée avec succès.");
+        return Result<Reservation>.Success(reservation);
     }
 }

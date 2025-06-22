@@ -27,7 +27,22 @@ public static class BookingEndpoints
                 if (!result.IsSuccess)
                     return Results.BadRequest(result.ErrorMessage);
 
-                return Results.Ok(result.Message);
+                var reservation = result.Value!;
+                var dto = new ReservationDto
+                {
+                    Id = reservation.Id,
+                    StartDate = reservation.StartDate,
+                    EndDate = reservation.EndDate,
+                    TotalAmount = reservation.TotalAmount,
+                    IsPaid = reservation.IsPaid,
+                    Status = reservation.Status.ToString(),
+                    RoomNumbers = reservation.ReservationRooms
+                        .Select(rr => rr.Room?.Number ?? "")
+                        .ToList()
+                };
+
+                return Results.Ok(dto);
+
             });
 
         group.MapPost("/available-rooms", (

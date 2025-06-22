@@ -76,6 +76,9 @@ public class CreateReservationTests
     public void Execute_ShouldSucceed_WhenAllIsValid()
     {
         var roomId = Guid.NewGuid();
+        var clientId = Guid.NewGuid();
+        var startDate = DateTime.Today;
+        var endDate = DateTime.Today.AddDays(1);
 
         var room = new Room
         {
@@ -87,10 +90,20 @@ public class CreateReservationTests
 
         _roomRepoMock.Setup(r => r.GetWithReservationsById(roomId)).Returns(room);
 
-        var result = _useCase.Execute(Guid.NewGuid(), DateTime.Today, DateTime.Today.AddDays(1), new List<Guid> { roomId });
+        var result = _useCase.Execute(clientId, startDate, endDate, new List<Guid> { roomId });
 
         Assert.True(result.IsSuccess);
-        Assert.Equal("Réservation créée avec succès.", result.Message);
+        Assert.NotNull(result.Value);
+
+        var reservation = result.Value!;
+        Assert.Equal(clientId, reservation.ClientId);
+        Assert.Equal(startDate, reservation.StartDate);
+        Assert.Equal(endDate, reservation.EndDate);
+        Assert.Equal(ReservationStatus.PendingPayment, reservation.Status);
+        Assert.False(reservation.IsPaid);
+        Assert.Single(reservation.ReservationRooms);
+        Assert.Equal(roomId, reservation.ReservationRooms[0].RoomId);
+
         _reservationRepoMock.Verify(r => r.Create(It.IsAny<Reservation>()), Times.Once);
     }
 }
