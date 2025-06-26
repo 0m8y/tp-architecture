@@ -166,8 +166,9 @@ public static class BookingEndpoints
         group.MapPost("/reservations/{id:guid}/cancel", [Authorize] (
             Guid id,
             HttpContext context,
-            [FromQuery] bool refund,
-            [FromServices] CancelReservation useCase) =>
+            [FromServices] CancelReservation useCase,
+            [FromQuery] bool refund = false
+            ) =>
         {
             var user = context.User;
             var clientIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;

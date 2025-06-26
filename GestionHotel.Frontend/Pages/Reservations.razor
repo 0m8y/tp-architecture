@@ -40,13 +40,21 @@ else
                             <p class="card-text">
                                 @($"{reservation.RoomIds.Count} chambre(s) – Statut : {reservation.Status}")
                             </p>
-                            @if (!reservation.IsPaid)
+                            @if (!reservation.IsPaid && !reservation.Status.Contains("Cancelled"))
                             {
-                                <button class="btn btn-warning" @onclick="() => ShowConfirmationPopup(reservation.Id)">Payer maintenant</button>
+                                <button class="btn btn-warning" @onclick="() => GoToPayment(reservation.Id)">Payer maintenant</button>
+                            }
+                            else if (!reservation.Status.Contains("Cancelled"))
+                            {
+                                <span class="btn btn-success">Payée</span>
                             }
                             else
                             {
-                                <span class="badge bg-success">Payée</span>
+                                <span class="btn btn-danger">Annulée</span>
+                            }
+                            @if (!reservation.Status.Contains("Cancelled"))
+                            {
+                                <button class="btn btn-danger ms-2" @onclick="() => ShowCancelPopup(reservation)">Annuler</button>
                             }
                         </div>
                     </div>
@@ -56,28 +64,32 @@ else
     </div>
 }
 
-
-<!-- Popup 1 : Confirmation conditions -->
-@if (showConfirmationPopup)
+@if (showCancelPopup && reservationToCancel != null)
 {
+    var now = DateTime.Now;
+    var delta = (reservationToCancel.StartDate - now).TotalHours;
+    var refundEligible = delta >= 48;
+
     <div class="modal show d-block" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Confirmation</h5>
+                    <h5 class="modal-title">Annulation de réservation</h5>
                 </div>
                 <div class="modal-body">
-                    <p>Veuillez confirmer que vous acceptez les conditions générales de réservation.</p>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="termsCheckbox" @bind="termsAccepted" />
-                        <label class="form-check-label" for="termsCheckbox">
-                            J'accepte les conditions d'utilisation.
-                        </label>
-                    </div>
+                    <p>Voulez-vous annuler votre réservation ?</p>
+                    @if (refundEligible)
+                    {
+                        <p class="text-success">Le montant remboursé sera de : @reservationToCancel.TotalAmount.ToString("0.00") €</p>
+                    }
+                    else
+                    {
+                        <p class="text-danger">Aucun remboursement ne sera effectué car la réservation débute dans moins de 48 heures.</p>
+                    }
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" @onclick="() => showConfirmationPopup = false">Annuler</button>
-                    <button class="btn btn-primary" @onclick="ConfirmReservation" disabled="@(termsAccepted == false)">Confirmer</button>
+                    <button class="btn btn-secondary" @onclick="() => showCancelPopup = false">Retour</button>
+                    <button class="btn btn-danger" @onclick="ConfirmCancellation">Confirmer l’annulation</button>
                 </div>
             </div>
         </div>
@@ -85,35 +97,10 @@ else
     <div class="modal-backdrop fade show"></div>
 }
 
-<!-- Popup 2 : Réservation confirmée -->
-@if (showSuccessPopup)
-{
-    <div class="modal show d-block" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Réservation confirmée</h5>
-                </div>
-                <div class="modal-body">
-                    <p>Votre réservation est confirmée et en attente de paiement.</p>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-success" @onclick="GoToPayment">Payer maintenant</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-backdrop fade show"></div>
-}
 
 @code {
     private List<ReservationDto>? reservations;
     private bool isLoading = true;
-
-    private bool showConfirmationPopup = false;
-    private bool termsAccepted = false;
-    private bool showSuccessPopup = false;
-    private Guid? selectedReservationId = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -136,22 +123,42 @@ else
             : "/img/default-room.jpg";
     }
 
-    private void ShowConfirmationPopup(Guid reservationId)
+    private void GoToPayment(Guid reservationId)
     {
-        selectedReservationId = reservationId;
-        termsAccepted = false;
-        showConfirmationPopup = true;
+        Navigation.NavigateTo($"/payment/{reservationId}");
     }
 
-    private void ConfirmReservation()
+    private bool showCancelPopup = false;
+    private ReservationDto? reservationToCancel;
+
+    private void ShowCancelPopup(ReservationDto reservation)
     {
-        showConfirmationPopup = false;
-        showSuccessPopup = true;
+        reservationToCancel = reservation;
+        showCancelPopup = true;
     }
 
-    private void GoToPayment()
+    private async void ConfirmCancellation()
     {
-        showSuccessPopup = false;
-        Navigation.NavigateTo($"/payment/{selectedReservationId}");
+        await AuthClient.InitAsync(LocalStorage);
+
+        if (reservationToCancel is null)
+            return;
+
+        showCancelPopup = false;
+
+        var response = await AuthClient.Client.PostAsync($"https://localhost:7208/api/v1/bookings/reservations/{reservationToCancel.Id}/cancel", null);
+
+        reservationToCancel = null;
+
+        if (response.IsSuccessStatusCode)
+        {
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+        }
+        else
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Erreur lors de l'annulation : {errorContent}");
+        }
     }
+
 }
