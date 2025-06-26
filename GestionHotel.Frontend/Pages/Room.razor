@@ -249,7 +249,7 @@
         var token = await LocalStorage.GetItemAsync<string>("authToken");
         Console.WriteLine($"TOKEN: {token}");
         var response = await AuthClient.Client.PostAsJsonAsync("https://localhost:7208/api/v1/bookings/booking", reservationRequest);
-
+    
         if (response.IsSuccessStatusCode)
         {
             showResultPopup = true;

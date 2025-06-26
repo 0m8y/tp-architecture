@@ -40,11 +40,14 @@ else
                             <p class="card-text">
                                 @($"{reservation.RoomIds.Count} chambre(s) – Statut : {reservation.Status}")
                             </p>
-                            <p class="card-text">
-                                <small class="text-muted">
-                                    @($"{reservation.TotalAmount:F2} € – {(reservation.IsPaid ? "Payée" : "En attente de paiement")}")
-                                </small>
-                            </p>
+                            @if (!reservation.IsPaid)
+                            {
+                                <button class="btn btn-warning" @onclick="() => ShowConfirmationPopup(reservation.Id)">Payer maintenant</button>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Payée</span>
+                            }
                         </div>
                     </div>
                 </div>
@@ -53,9 +56,64 @@ else
     </div>
 }
 
+
+<!-- Popup 1 : Confirmation conditions -->
+@if (showConfirmationPopup)
+{
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmation</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Veuillez confirmer que vous acceptez les conditions générales de réservation.</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="termsCheckbox" @bind="termsAccepted" />
+                        <label class="form-check-label" for="termsCheckbox">
+                            J'accepte les conditions d'utilisation.
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="() => showConfirmationPopup = false">Annuler</button>
+                    <button class="btn btn-primary" @onclick="ConfirmReservation" disabled="@(termsAccepted == false)">Confirmer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+<!-- Popup 2 : Réservation confirmée -->
+@if (showSuccessPopup)
+{
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Réservation confirmée</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Votre réservation est confirmée et en attente de paiement.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" @onclick="GoToPayment">Payer maintenant</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
 @code {
     private List<ReservationDto>? reservations;
     private bool isLoading = true;
+
+    private bool showConfirmationPopup = false;
+    private bool termsAccepted = false;
+    private bool showSuccessPopup = false;
+    private Guid? selectedReservationId = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -69,12 +127,31 @@ else
         }
 
         isLoading = false;
-    }
+        }
 
     private string GetImagePath(ReservationDto reservation)
     {
         return reservation.RoomIds != null && reservation.RoomIds.Any()
             ? $"/rooms/{reservation.RoomIds.First()}.jpg"
             : "/img/default-room.jpg";
+    }
+
+    private void ShowConfirmationPopup(Guid reservationId)
+    {
+        selectedReservationId = reservationId;
+        termsAccepted = false;
+        showConfirmationPopup = true;
+    }
+
+    private void ConfirmReservation()
+    {
+        showConfirmationPopup = false;
+        showSuccessPopup = true;
+    }
+
+    private void GoToPayment()
+    {
+        showSuccessPopup = false;
+        Navigation.NavigateTo($"/payment/{selectedReservationId}");
     }
 }
