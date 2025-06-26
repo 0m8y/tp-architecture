@@ -193,13 +193,18 @@ public static class BookingEndpoints
 
         group.MapPost("/reservations/{id:guid}/checkin", [Authorize(Roles = "Receptionist")] async (
             Guid id,
-            [FromBody] CheckInReservationRequest request,
-            CheckInReservation useCase) =>
+            CheckInReservation useCase,
+            [FromBody] CheckInReservationRequest request = null) =>
         {
-            if (!MiniValidator.TryValidate(request, out var errors))
+            if (request != null && !MiniValidator.TryValidate(request, out var errors))
                 return Results.ValidationProblem(errors);
-
-            var result = await useCase.ExecuteAsync(id, request.CardNumber, request.ExpiryDate, request.Provider);
+            
+            var result = await useCase.ExecuteAsync(
+                id,
+                request?.CardNumber,
+                request?.ExpiryDate,
+                request?.Provider
+            );
 
             if (!result.IsSuccess)
                 return Results.BadRequest(result.ErrorMessage);
@@ -208,6 +213,28 @@ public static class BookingEndpoints
         })
         .WithName("CheckInReservation")
         .WithOpenApi();
+
+        group.MapGet("/all-reservations", [Authorize(Roles = "Receptionist")] (
+            IReservationRepository reservationRepository) =>
+        {
+            var reservations = reservationRepository.GetAll();
+
+            var dtos = reservations.Select(r => new ReservationDto
+            {
+                Id = r.Id,
+                StartDate = r.StartDate,
+                EndDate = r.EndDate,
+                TotalAmount = r.TotalAmount,
+                IsPaid = r.IsPaid,
+                Status = r.Status.ToString(),
+                RoomIds = r.ReservationRooms
+                    .Select(rr => rr.RoomId)
+                    .Distinct()
+                    .ToList()
+            }).ToList();
+
+            return Results.Ok(dtos);
+        });
 
         group.MapPost("/reservations/{id:guid}/checkout", [Authorize(Roles = "Receptionist")] async (
             Guid id,

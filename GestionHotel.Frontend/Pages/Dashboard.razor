@@ -1,0 +1,138 @@
+﻿@page "/dashboard"
+@inject AuthorizedHttpClient AuthClient
+@inject NavigationManager Navigation
+@using GestionHotel.Frontend.Dto
+@using Blazored.LocalStorage;
+@inject ILocalStorageService LocalStorage
+
+<div class="container my-4">
+    <h2 class="text-center mb-4">Planning des Réservations</h2>
+
+    <div class="text-end mb-3">
+        <button class="btn btn-outline-primary" @onclick="ToggleView">
+            @(showCalendar ? "Voir en liste 📋" : "Voir en calendrier 🗓️")
+        </button>
+    </div>
+
+    @if (showCalendar)
+    {
+        <div id="calendar"></div>
+    }
+    else
+    {
+        <div class="list-group">
+            @foreach (var r in reservations)
+            {
+                <div class="list-group-item">
+                    <h5 class="mb-1">Réservation n° @r.Id</h5>
+                    <p class="mb-1">📅 Du <strong>@r.StartDate.ToShortDateString()</strong> au <strong>@r.EndDate.ToShortDateString()</strong></p>
+                    <p class="mb-1">🛏️ Chambres : @r.RoomIds.Count</p>
+                    <p class="mb-1">💰 Montant : @r.TotalAmount.ToString("0.00") €</p>
+                    <p class="mb-1">💳 Statut : @(r.Status)</p>
+                    @if (r.Status != "CheckOut" && r.Status != "CheckIn")
+                    {
+                        <button class="btn btn-sm btn-success me-2" @onclick="() => HandleCheckin(r.Id, r.IsPaid)">Check-in</button>
+                    }
+                    @if (r.Status == "CheckIn")
+                    {
+                        <button class="btn btn-sm btn-success me-2" @onclick="() => HandleCheckout(r.Id)">Check-Out</button>
+                    }
+
+                    <button class="btn btn-sm btn-danger" @onclick="() => CancelReservation(r.Id)">Annuler</button>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<ReservationDto> reservations = new();
+    private bool showCalendar = false;
+
+    private void ToggleView()
+    {
+        showCalendar = !showCalendar;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadReservations();
+            await JS.InvokeVoidAsync("renderCalendar", reservations);
+        }
+    }
+
+    private async Task LoadReservations()
+    {
+        await AuthClient.InitAsync(LocalStorage);
+
+        var response = await AuthClient.Client.GetAsync("https://localhost:7208/api/v1/bookings/all-reservations");
+
+        if (response.IsSuccessStatusCode)
+        {
+            reservations = await response.Content.ReadFromJsonAsync<List<ReservationDto>>() ?? new();
+            StateHasChanged();
+        }
+    }
+
+    [Inject] private IJSRuntime JS { get; set; }
+
+    private async Task CancelReservation(Guid reservationId)
+    {
+        var confirm = await JS.InvokeAsync<bool>("confirm", "Confirmez-vous l'annulation ?");
+        if (!confirm) return;
+
+        var response = await AuthClient.Client.PostAsync(
+            $"https://localhost:7208/api/v1/bookings/reservations/{reservationId}/cancel", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            reservations = reservations.Where(r => r.Id != reservationId).ToList();
+            StateHasChanged();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Erreur lors de l'annulation.");
+        }
+    }
+
+    private async Task HandleCheckin(Guid reservationId, bool isPaid)
+    {
+        if (isPaid)
+        {
+            var response = await AuthClient.Client.PostAsync(
+                $"https://localhost:7208/api/v1/bookings/reservations/{reservationId}/checkin", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("alert", "Check-in réussi !");
+                await LoadReservations();
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("alert", "Erreur lors du check-in.");
+            }
+        }
+        else
+        {
+            Navigation.NavigateTo($"/payment/{reservationId}?isCheckin=true");
+        }
+    }
+
+    private async Task HandleCheckout(Guid reservationId)
+    {
+        var response = await AuthClient.Client.PostAsync(
+            $"https://localhost:7208/api/v1/bookings/reservations/{reservationId}/checkin", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Check-out réussi !");
+            await LoadReservations();
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Erreur lors du check-out.");
+        }
+    }
+}

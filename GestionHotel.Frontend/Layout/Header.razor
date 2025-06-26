@@ -15,13 +15,16 @@
             <!-- Menu central dynamique -->
             <div class="position-absolute start-50 translate-middle-x text-center">
                 <ul class="navbar-nav flex-row gap-4">
-                    <li class="nav-item">
-                        <NavLink class="nav-menu" href="/">Accueil</NavLink>
-                    </li>
-                    <li class="nav-item">
-                        <NavLink class="nav-menu" href="/get-rooms">Réserver</NavLink>
-                    </li>
-                    @if (IsAuthenticated)
+                    @if (IsAuthenticated && IsClient || !IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <NavLink class="nav-menu" href="/">Accueil</NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <NavLink class="nav-menu" href="/get-rooms">Réserver</NavLink>
+                        </li>
+                    }
+                    @if (IsClient)
                     {
                         <li class="nav-item">
                             <NavLink class="nav-menu" href="/reservations">Réservations</NavLink>
@@ -39,9 +42,12 @@
                             <NavLink class="nav-menu" href="/cleaning">Tâches</NavLink>
                         </li>
                     }
-                    <li class="nav-item">
-                        <NavLink class="nav-menu" href="/nos-prestations">Nos Préstations</NavLink>
-                    </li>
+                    @if (IsAuthenticated && IsClient || !IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <NavLink class="nav-menu" href="/nos-prestations">Nos Préstations</NavLink>
+                        </li>
+                    }
                 </ul>
             </div>
 
@@ -62,6 +68,7 @@
 
 @code {
     private bool IsAuthenticated;
+    private bool IsClient;
     private bool IsReceptionist;
     private bool IsCleaner;
 
@@ -82,9 +89,11 @@
 
             IsReceptionist = user.IsInRole("Receptionist");
             IsCleaner = user.IsInRole("Cleaner");
+            IsClient = user.IsInRole("Client");
 
             Console.WriteLine($"[HEADER] EstReceptionist : {IsReceptionist}");
             Console.WriteLine($"[HEADER] EstCleaner     : {IsCleaner}");
+            Console.WriteLine($"[HEADER] EstClient     : {IsClient}");
         }
     }
 

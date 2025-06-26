@@ -1,5 +1,4 @@
-﻿
-@page "/payment/{ReservationId:guid}"
+﻿@page "/payment/{ReservationId:guid}"
 @inject AuthorizedHttpClient AuthClient
 @inject NavigationManager Navigation
 @using GestionHotel.Frontend.Dto
@@ -74,6 +73,9 @@ else
 
 @code {
     [Parameter] public Guid ReservationId { get; set; }
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public bool IsCheckin { get; set; }
 
     private string? successMessage;
     private string? errorMessage;
@@ -101,15 +103,19 @@ else
 
         try
         {
-            var response = await AuthClient.Client.PostAsJsonAsync(
-                $"https://localhost:7208/api/v1/bookings/reservations/{ReservationId}/pay",
-                formModel);
+            var endpoint = IsCheckin
+                ? $"https://localhost:7208/api/v1/bookings/reservations/{ReservationId}/checkin"
+                : $"https://localhost:7208/api/v1/bookings/reservations/{ReservationId}/pay";
+
+            var response = await AuthClient.Client.PostAsJsonAsync(endpoint, formModel);
 
             if (response.IsSuccessStatusCode)
             {
                 successMessage = "Paiement effectué avec succès !";
                 await Task.Delay(3000);
-                Navigation.NavigateTo("/reservations");
+
+                var navigateTo = IsCheckin ? "/dashboard" : "/reservations";
+                Navigation.NavigateTo(navigateTo);
             }
             else
             {
