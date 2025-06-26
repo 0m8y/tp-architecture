@@ -37,8 +37,10 @@
                     {
                         <button class="btn btn-sm btn-success me-2" @onclick="() => HandleCheckout(r.Id)">Check-Out</button>
                     }
-
+                    @if (r.Status != "CheckOut" && r.Status != "CheckIn")
+                    {
                     <button class="btn btn-sm btn-danger" @onclick="() => CancelReservation(r.Id)">Annuler</button>
+                    }
                 </div>
             }
         </div>
@@ -49,9 +51,15 @@
     private List<ReservationDto> reservations = new();
     private bool showCalendar = false;
 
-    private void ToggleView()
+    private async Task ToggleView()
     {
         showCalendar = !showCalendar;
+
+        if (showCalendar && reservations.Any())
+        {
+            await Task.Delay(50);
+            await JS.InvokeVoidAsync("renderCalendar", reservations);
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -123,7 +131,7 @@
     private async Task HandleCheckout(Guid reservationId)
     {
         var response = await AuthClient.Client.PostAsync(
-            $"https://localhost:7208/api/v1/bookings/reservations/{reservationId}/checkin", null);
+            $"https://localhost:7208/api/v1/bookings/reservations/{reservationId}/checkout", null);
 
         if (response.IsSuccessStatusCode)
         {
