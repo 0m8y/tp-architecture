@@ -156,7 +156,7 @@ L’architecture du projet suit les principes SOLID, garantissant un code mainte
 
 ### Clean Architecture
 
-![Architecture globale](Diagrams/global-architecture.png)
+![Architecture globale](Images/global-architecture.png)
 
 ---
 
@@ -177,11 +177,63 @@ graph TD
 
 ---
 
-## Bonus / Fonctionnalités en cours
+## Tests unitaires
 
-* Signalement de casse au check-out (implémentation prévue, structure en place)
-* Notification automatique via service externe (non activé)
-* Statistiques ou dashboard pour la réception
+Des tests ont été réalisés pour valider les cas d’usage métier, les services internes et les règles de validation.
+
+### Répertoire de tests
+
+```
+GestionHotel.Tests/
+├── Application
+│   ├── Services
+│   │   └── PasswordHasherTests.cs
+│   ├── UseCases
+│   │   ├── Booking
+│   │   │   ├── CancelReservationTests.cs
+│   │   │   ├── CheckInReservationTests.cs
+│   │   │   ├── CheckOutReservationTests.cs
+│   │   │   ├── CreateReservationTests.cs
+│   │   │   ├── GetAvailableRoomsTests.cs
+│   │   │   ├── GetReservationByClientTests.cs
+│   │   │   ├── GetRoomsToCleanTests.cs
+│   │   │   ├── MarkRoomAsCleanedTests.cs
+│   │   │   └── PayReservationTests.cs
+│   │   └── Client
+│   │       ├── CreateClientTests.cs
+│   │       └── LoginClientTests.cs
+│   └── Validators
+│       └── IsExpiryDateValidTests.cs
+```
+
+---
+
+## Interface utilisateur — Frontend Blazor WebAssembly
+
+Un frontend moderne a été conçu pour rendre l’expérience utilisateur immersive. Il inclut des vues pour :
+
+* Connexion avec rôles (`login.png`)
+* Page d’accueil immersive (`main.png`)
+* Recherche de chambres (`search.png`)
+* Résultats des chambres disponibles (`chambres.png`)
+* Détails d’une chambre (`chambre.png`)
+* Paiement visuel avec prestataire (`pay.png`)
+* Réservation et calendrier (`reservations.png`, `calendar.png`)
+* Dashboard de gestion (`dashboard.png`)
+
+### Aperçu visuel
+
+| Écran          | Capture d’écran                          |
+| -------------- | ---------------------------------------- |
+| Accueil        | ![Main](Images/main.png)                 |
+| Login          | ![Login](Images/login.png)               |
+| Recherche      | ![Search](Images/search.png)             |
+| Résultats      | ![Chambres](Images/chambres.png)         |
+| Détail chambre | ![Chambre](Images/chambre.png)           |
+| Paiement       | ![Pay](Images/pay.png)                   |
+| Réservation    | ![Reservations](Images/reservations.png) |
+| Calendrier     | ![Calendar](Images/calendar.png)         |
+| Dashboard      | ![Dashboard](Images/dashboard.png)       |
 
 ---
 
